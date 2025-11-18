@@ -20,54 +20,59 @@ import {
   MapPin,
   CheckCircle,
   Star,
+  Shield,
 } from "lucide-react";
+import { RoleGuard, SuperAdminOnly } from "@/components/auth/RoleGuard";
 
 const sidebarItems = [
   {
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
+    roles: ['ADMIN', 'SUPER_ADMIN'],
   },
   {
     title: "Users",
     href: "/dashboard/users",
     icon: Users,
+    roles: ['ADMIN', 'SUPER_ADMIN'],
   },
   {
     title: "Service Providers",
     href: "/dashboard/service-provider",
     icon: UserCheck,
+    roles: ['ADMIN', 'SUPER_ADMIN'],
   },
-  // {
-  //   title: "Verifications",
-  //   href: "/dashboard/verifications",
-  //   icon: CheckCircle,
-  // },
   {
     title: "Services",
     href: "/dashboard/services",
     icon: Briefcase,
+    roles: ['ADMIN', 'SUPER_ADMIN'],
   },
   {
     title: "Areas",
     href: "/dashboard/areas",
     icon: MapPin,
+    roles: ['SUPER_ADMIN'], // Only super admin can manage areas
   },
   {
     title: "Orders",
     href: "/dashboard/order",
     icon: ShoppingCart,
+    roles: ['ADMIN', 'SUPER_ADMIN'],
+  },
+  {
+    title: "Disputes",
+    href: "/dashboard/disputes",
+    icon: Shield,
+    roles: ['ADMIN', 'SUPER_ADMIN'],
   },
   {
     title: "Transfers",
     href: "/dashboard/transfer",
     icon: ArrowRightLeft,
+    roles: ['SUPER_ADMIN'], // Only super admin can manage transfers
   },
-  // {
-  //   title: "Reviews",
-  //   href: "/dashboard/reviews",
-  //   icon: Star,
-  // },
 ];
 
 interface SidebarProps {
@@ -77,7 +82,7 @@ interface SidebarProps {
 export function Sidebar({ className }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { logout } = useAuth();
+  const { logout, userRole, adminInfo } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -98,24 +103,29 @@ export function Sidebar({ className }: SidebarProps) {
               <AvatarFallback>AD</AvatarFallback>
             </Avatar>
             <div>
-              <h2 className="text-lg font-semibold">Admin</h2>
-              <p className="text-sm text-muted-foreground">Dashboard</p>
+              <h2 className="text-lg font-semibold">
+                {adminInfo?.name || 'Admin'}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {userRole === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}
+              </p>
             </div>
           </div>
           <Separator className="mb-4" />
           <div className="space-y-1 flex-1 overflow-y-auto">
             {sidebarItems.map((item) => (
-              <Button
-                key={item.href}
-                variant={pathname === item.href ? "secondary" : "ghost"}
-                className="w-full justify-start"
-                asChild
-              >
-                <Link href={item.href}>
-                  <item.icon className="mr-2 h-4 w-4" />
-                  {item.title}
-                </Link>
-              </Button>
+              <RoleGuard key={item.href} allowedRoles={item.roles}>
+                <Button
+                  variant={pathname === item.href ? "secondary" : "ghost"}
+                  className="w-full justify-start"
+                  asChild
+                >
+                  <Link href={item.href}>
+                    <item.icon className="mr-2 h-4 w-4" />
+                    {item.title}
+                  </Link>
+                </Button>
+              </RoleGuard>
             ))}
           </div>
           <div className="pt-4 shrink-0">

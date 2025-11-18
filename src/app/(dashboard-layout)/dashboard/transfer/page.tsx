@@ -211,7 +211,7 @@ export default function TransferPage() {
         </p>
       </div>
 
-      <TransferStats
+      {/* <TransferStats
         totalAmount={stats.totalAmount}
         pending={stats.pending}
         completed={stats.completed}
@@ -247,7 +247,7 @@ export default function TransferPage() {
         transfer={selectedTransfer}
         open={showDetailsDialog}
         onOpenChange={setShowDetailsDialog}
-      />
+      /> */}
     </div>
   );
 }

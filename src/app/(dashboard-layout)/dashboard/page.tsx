@@ -1,7 +1,7 @@
-import { StatsCards } from './_components/StatsCards'
-import { RecentOrders } from './_components/RecentOrders'
-import { RecentReviews } from './_components/RecentReviews'
-import { QuickActions } from './_components/QuickActions'
+import { StatsCards } from "./_components/StatsCards";
+import { RecentOrders } from "./_components/RecentOrders";
+import { RecentReviews } from "./_components/RecentReviews";
+import { QuickActions } from "./_components/QuickActions";
 
 export default function DashboardPage() {
   return (
@@ -11,14 +11,14 @@ export default function DashboardPage() {
         <p className="text-muted-foreground">Welcome to your admin dashboard</p>
       </div>
 
-      <StatsCards />
+      {/* <StatsCards />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <QuickActions />
         <RecentReviews />
       </div>
 
-      <RecentOrders />
+      <RecentOrders /> */}
     </div>
-  )
+  );
 }

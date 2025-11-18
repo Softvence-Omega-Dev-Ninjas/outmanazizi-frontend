@@ -19,17 +19,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { MoreHorizontal, Ban, CheckCircle, Trash2, Eye } from 'lucide-react'
+import { MoreHorizontal, Ban, CheckCircle, Trash2, Eye, UserCog } from 'lucide-react'
 import { UserDetailsDialog } from './UserDetailsDialog'
+import { SuperAdminOnly } from '@/components/auth/RoleGuard'
 
 interface UserActionsProps {
   user: User
   onBlock: (userId: string) => void
   onUnblock: (userId: string) => void
   onDelete: (userId: string) => void
+  onRoleChange: (user: User) => void
 }
 
-export function UserActions({ user, onBlock, onUnblock, onDelete }: UserActionsProps) {
+export function UserActions({ user, onBlock, onUnblock, onDelete, onRoleChange }: UserActionsProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [showDetailsDialog, setShowDetailsDialog] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -68,6 +70,12 @@ export function UserActions({ user, onBlock, onUnblock, onDelete }: UserActionsP
             <Eye className="mr-2 size-4" />
             View Details
           </DropdownMenuItem>
+          <SuperAdminOnly>
+            <DropdownMenuItem onClick={() => onRoleChange(user)}>
+              <UserCog className="mr-2 size-4" />
+              Change Role
+            </DropdownMenuItem>
+          </SuperAdminOnly>
           {user.isBlocked ? (
             <DropdownMenuItem onClick={handleUnblock} disabled={loading}>
               <CheckCircle className="mr-2 size-4" />
@@ -80,13 +88,15 @@ export function UserActions({ user, onBlock, onUnblock, onDelete }: UserActionsP
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => setShowDeleteDialog(true)}
-            className="text-destructive"
-          >
-            <Trash2 className="mr-2 size-4" />
-            Delete User
-          </DropdownMenuItem>
+          <SuperAdminOnly>
+            <DropdownMenuItem
+              onClick={() => setShowDeleteDialog(true)}
+              className="text-destructive"
+            >
+              <Trash2 className="mr-2 size-4" />
+              Delete User
+            </DropdownMenuItem>
+          </SuperAdminOnly>
         </DropdownMenuContent>
       </DropdownMenu>
 

@@ -1,70 +1,70 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { orderService } from '@/services/orderService'
+import { disputeService } from '@/services/disputeService'
 import { useAuth } from '@/context/AuthContext'
 import { toast } from 'sonner'
 
-export function useOrders() {
+export function useDisputes() {
   const { token } = useAuth()
 
   return useQuery({
-    queryKey: ['orders'],
+    queryKey: ['disputes'],
     queryFn: async () => {
       if (!token) throw new Error('No token')
-      const response = await orderService.getAllOrders(token)
+      const response = await disputeService.getAllDisputes(token)
       return response.data || []
     },
     enabled: !!token,
   })
 }
 
-export function useOrder(id: string) {
+export function useDispute(id: string) {
   const { token } = useAuth()
 
   return useQuery({
-    queryKey: ['order', id],
+    queryKey: ['dispute', id],
     queryFn: async () => {
       if (!token) throw new Error('No token')
-      const response = await orderService.getOrderById(id, token)
+      const response = await disputeService.getDisputeById(id, token)
       return response.data
     },
     enabled: !!token && !!id,
   })
 }
 
-export function useUpdateOrder() {
+export function useResolveDispute() {
   const queryClient = useQueryClient()
   const { token } = useAuth()
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+    mutationFn: async (disputeId: string) => {
       if (!token) throw new Error('No token')
-      return orderService.updateOrder(id, data, token)
+      return disputeService.resolveDispute(disputeId, token)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] })
-      toast.success('Order updated successfully')
+      queryClient.invalidateQueries({ queryKey: ['disputes'] })
+      toast.success('Dispute resolved successfully')
     },
     onError: () => {
-      toast.error('Failed to update order')
+      toast.error('Failed to resolve dispute')
     },
   })
 }
 
-export function useDeleteOrder() {
+export function useDeleteDispute() {
   const queryClient = useQueryClient()
   const { token } = useAuth()
 
   return useMutation({
-    mutationFn: async (orderId: string) => {
+    mutationFn: async (disputeId: string) => {
       if (!token) throw new Error('No token')
-      return orderService.deleteOrder(orderId, token)
+      return disputeService.deleteDispute(disputeId, token)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] })
-      toast.success('Order deletion requested successfully')
+      queryClient.invalidateQueries({ queryKey: ['disputes'] })
+      toast.success('Dispute deleted successfully')
     },
     onError: () => {
-      toast.error('Failed to request order deletion')
+      toast.error('Failed to delete dispute')
     },
   })
 }

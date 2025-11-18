@@ -9,13 +9,13 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Filter } from 'lucide-react'
 
-interface OrderFiltersProps {
+interface DisputeFiltersProps {
   statusFilter: string[]
   onStatusChange: (status: string[]) => void
   onReset: () => void
 }
 
-export function OrderFilters({ statusFilter, onStatusChange, onReset }: OrderFiltersProps) {
+export function DisputeFilters({ statusFilter, onStatusChange, onReset }: DisputeFiltersProps) {
   const hasFilters = statusFilter.length > 0
 
   return (
@@ -43,40 +43,16 @@ export function OrderFilters({ statusFilter, onStatusChange, onReset }: OrderFil
             Pending
           </DropdownMenuCheckboxItem>
           <DropdownMenuCheckboxItem
-            checked={statusFilter.includes('in-progress')}
+            checked={statusFilter.includes('resolved')}
             onCheckedChange={(checked) => {
               onStatusChange(
                 checked
-                  ? [...statusFilter, 'in-progress']
-                  : statusFilter.filter((s) => s !== 'in-progress')
+                  ? [...statusFilter, 'resolved']
+                  : statusFilter.filter((s) => s !== 'resolved')
               )
             }}
           >
-            In Progress
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            checked={statusFilter.includes('completed')}
-            onCheckedChange={(checked) => {
-              onStatusChange(
-                checked
-                  ? [...statusFilter, 'completed']
-                  : statusFilter.filter((s) => s !== 'completed')
-              )
-            }}
-          >
-            Completed
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem
-            checked={statusFilter.includes('delete-request')}
-            onCheckedChange={(checked) => {
-              onStatusChange(
-                checked
-                  ? [...statusFilter, 'delete-request']
-                  : statusFilter.filter((s) => s !== 'delete-request')
-              )
-            }}
-          >
-            Delete Request
+            Resolved
           </DropdownMenuCheckboxItem>
         </DropdownMenuContent>
       </DropdownMenu>
