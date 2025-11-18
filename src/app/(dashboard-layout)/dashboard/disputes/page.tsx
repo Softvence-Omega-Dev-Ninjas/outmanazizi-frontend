@@ -7,7 +7,11 @@ import { DisputesTable } from "./_components/DisputesTable";
 import { DisputeDetailsDialog } from "./_components/DisputeDetailsDialog";
 import { DisputeFilters } from "./_components/DisputeFilters";
 import { Search } from "lucide-react";
-import { useDisputes, useResolveDispute, useDeleteDispute } from "@/hooks/useDisputes";
+import {
+  useDisputes,
+  useResolveDispute,
+  useDeleteDispute,
+} from "@/hooks/useDisputes";
 
 export default function DisputesPage() {
   const { data: disputes = [], isLoading } = useDisputes();
@@ -17,6 +21,8 @@ export default function DisputesPage() {
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+
+  console.log(disputes);
 
   const filteredDisputes = useMemo(() => {
     let filtered = disputes;
@@ -35,10 +41,8 @@ export default function DisputesPage() {
     // Status filter
     if (statusFilter.length > 0) {
       filtered = filtered.filter((dispute: Dispute) => {
-        if (statusFilter.includes("resolved") && dispute.isSolved)
-          return true;
-        if (statusFilter.includes("pending") && !dispute.isSolved)
-          return true;
+        if (statusFilter.includes("resolved") && dispute.isSolved) return true;
+        if (statusFilter.includes("pending") && !dispute.isSolved) return true;
         return false;
       });
     }

@@ -33,6 +33,8 @@ export function DisputeDetailsDialog({
 }: DisputeDetailsDialogProps) {
   if (!dispute) return null;
 
+  console.log("Dispute Details:", dispute);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -44,7 +46,9 @@ export function DisputeDetailsDialog({
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Shield className="size-5 text-red-500" />
-              <h3 className="text-xl font-semibold">Dispute #{dispute.id.slice(0, 8)}</h3>
+              <h3 className="text-xl font-semibold">
+                Dispute #{dispute.id.slice(0, 8)}
+              </h3>
             </div>
             <p className="text-sm text-muted-foreground">
               Service ID: {dispute.serviceid}
@@ -72,7 +76,10 @@ export function DisputeDetailsDialog({
               <div>
                 <p className="text-sm font-medium">Raised By</p>
                 <p className="text-sm text-muted-foreground">
-                  {dispute.user?.name || 'Unknown User'}
+                  ID: {dispute.userId}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Name: {dispute.user?.name || "Unknown User"}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {dispute.user?.email}
@@ -85,7 +92,10 @@ export function DisputeDetailsDialog({
               <div>
                 <p className="text-sm font-medium">Against</p>
                 <p className="text-sm text-muted-foreground">
-                  {dispute.against?.name || 'Unknown User'}
+                  ID: {dispute.againstId}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Name: {dispute.against?.name || "Unknown User"}
                 </p>
                 <p className="text-xs text-muted-foreground">
                   {dispute.against?.email}
@@ -134,7 +144,9 @@ export function DisputeDetailsDialog({
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Image className="size-5 text-muted-foreground" />
-                  <h4 className="font-medium">Evidence ({dispute.pictures.length})</h4>
+                  <h4 className="font-medium">
+                    Evidence ({dispute.pictures.length})
+                  </h4>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {dispute.pictures.map((picture, idx) => (
@@ -160,7 +172,9 @@ export function DisputeDetailsDialog({
               <div className="space-y-3">
                 <h4 className="font-medium">Related Service</h4>
                 <div className="p-3 border rounded-lg">
-                  <p className="font-medium text-sm">{dispute.service.serviceName}</p>
+                  <p className="font-medium text-sm">
+                    {dispute.service.serviceName}
+                  </p>
                   <p className="text-xs text-muted-foreground mt-1">
                     {dispute.service.description}
                   </p>
