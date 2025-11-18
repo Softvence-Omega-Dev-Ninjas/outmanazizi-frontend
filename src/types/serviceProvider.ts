@@ -12,6 +12,7 @@ export interface ServiceProvider {
     isBlocked: boolean
     isEmailVerified: boolean
     provider?: string
+    role?: string
     createdAt: string
     updatedAt: string
   }

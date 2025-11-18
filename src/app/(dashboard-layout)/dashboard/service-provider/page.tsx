@@ -5,6 +5,7 @@ import { ServiceProvider } from "@/types/serviceProvider";
 import { ProvidersTable } from "./_components/ProvidersTable";
 import { ProvidersHeader } from "./_components/ProvidersHeader";
 import { Pagination } from "../users/_components/Pagination";
+import { RoleChangeDialog } from "@/components/admin/RoleChangeDialog";
 import {
   useServiceProviders,
   useBlockServiceProvider,
@@ -34,6 +35,8 @@ export default function ServiceProviderPage() {
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [verifiedFilter, setVerifiedFilter] = useState<string[]>([]);
   const [profileFilter, setProfileFilter] = useState<string[]>([]);
+  const [selectedUserForRole, setSelectedUserForRole] = useState<any>(null);
+  const [showRoleDialog, setShowRoleDialog] = useState(false);
 
   const filteredProviders = useMemo(() => {
     let filtered = providers;
@@ -146,6 +149,16 @@ export default function ServiceProviderPage() {
     deleteProviderMutation.mutate(userId);
   };
 
+  const handleRoleChange = (provider: ServiceProvider) => {
+    setSelectedUserForRole({
+      id: provider.user.id,
+      name: provider.user.name,
+      email: provider.user.email,
+      role: provider.user.role || "SERVICE_PROVIDER"
+    });
+    setShowRoleDialog(true);
+  };
+
   return (
     <div className="space-y-6">
       <ProvidersHeader
@@ -169,6 +182,13 @@ export default function ServiceProviderPage() {
         onVerify={handleVerify}
         onUnverify={handleUnverify}
         onDelete={handleDelete}
+        onRoleChange={handleRoleChange}
+      />
+
+      <RoleChangeDialog
+        user={selectedUserForRole}
+        open={showRoleDialog}
+        onOpenChange={setShowRoleDialog}
       />
 
       {totalPages > 1 && (

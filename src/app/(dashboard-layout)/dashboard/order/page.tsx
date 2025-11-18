@@ -7,11 +7,11 @@ import { OrdersTable } from "./_components/OrdersTable";
 import { OrderDetailsDialog } from "./_components/OrderDetailsDialog";
 import { OrderFilters } from "./_components/OrderFilters";
 import { Search } from "lucide-react";
-import { useOrders, useApproveOrder, useDeleteOrder } from "@/hooks/useOrders";
+import { useOrders, useUpdateOrder, useDeleteOrder } from "@/hooks/useOrders";
 
 export default function OrderPage() {
   const { data: orders = [], isLoading } = useOrders();
-  const approveOrderMutation = useApproveOrder();
+  const updateOrderMutation = useUpdateOrder();
   const deleteOrderMutation = useDeleteOrder();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
@@ -50,13 +50,20 @@ export default function OrderPage() {
         if (
           statusFilter.includes("pending") &&
           !order.isCompletedFromAdmin &&
-          !order.assignedServiceProviderId
+          !order.assignedServiceProviderId &&
+          !order.isDeleteRequestToAdmin
         )
           return true;
         if (
           statusFilter.includes("in-progress") &&
           order.assignedServiceProviderId &&
-          !order.isCompletedFromAdmin
+          !order.isCompletedFromAdmin &&
+          !order.isDeleteRequestToAdmin
+        )
+          return true;
+        if (
+          statusFilter.includes("delete-request") &&
+          order.isDeleteRequestToAdmin
         )
           return true;
         return false;
@@ -73,7 +80,10 @@ export default function OrderPage() {
   };
 
   const handleApprove = (orderId: string) => {
-    approveOrderMutation.mutate(orderId);
+    updateOrderMutation.mutate({ 
+      id: orderId, 
+      data: { isCompletedFromAdmin: true } 
+    });
   };
 
   const handleDelete = (orderId: string) => {
@@ -93,11 +103,11 @@ export default function OrderPage() {
         </p>
       </div>
 
-      {/* <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
-            placeholder="Search by customer, service, or order ID..."
+            placeholder="Search by service, description, or order ID..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -108,7 +118,7 @@ export default function OrderPage() {
           onStatusChange={setStatusFilter}
           onReset={handleResetFilters}
         />
-      </div> */}
+      </div>
 
       <OrdersTable
         orders={filteredOrders}

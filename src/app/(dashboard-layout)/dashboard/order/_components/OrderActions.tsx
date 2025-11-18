@@ -19,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { MoreHorizontal, Eye, CheckCircle, Trash2 } from 'lucide-react'
+import { MoreHorizontal, Eye, CheckCircle, Trash2, Edit, XCircle } from 'lucide-react'
 
 interface OrderActionsProps {
   order: Order
@@ -60,29 +60,41 @@ export function OrderActions({ order, onViewDetails, onApprove, onDelete }: Orde
             <Eye className="mr-2 size-4" />
             View Details
           </DropdownMenuItem>
-          {!order.isCompletedFromAdmin && (
+          {!order.isCompletedFromAdmin && !order.isDeleteRequestToAdmin && (
             <DropdownMenuItem onClick={handleApprove} disabled={loading}>
               <CheckCircle className="mr-2 size-4" />
               Mark as Completed
             </DropdownMenuItem>
           )}
+          {order.isDeleteRequestToAdmin && (
+            <DropdownMenuItem 
+              onClick={() => onApprove(order.id)} 
+              disabled={loading}
+              className="text-orange-600"
+            >
+              <XCircle className="mr-2 size-4" />
+              Approve Deletion
+            </DropdownMenuItem>
+          )}
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => setShowDeleteDialog(true)}
-            className="text-destructive"
-          >
-            <Trash2 className="mr-2 size-4" />
-            Delete Order
-          </DropdownMenuItem>
+          {!order.isDeleteRequestToAdmin && (
+            <DropdownMenuItem
+              onClick={() => setShowDeleteDialog(true)}
+              className="text-destructive"
+            >
+              <Trash2 className="mr-2 size-4" />
+              Request Deletion
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Order</DialogTitle>
+            <DialogTitle>Request Order Deletion</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this order? This action cannot be undone.
+              This will send a deletion request to admin. The order will be marked for review and deletion approval.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -90,7 +102,7 @@ export function OrderActions({ order, onViewDetails, onApprove, onDelete }: Orde
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={loading}>
-              {loading ? 'Deleting...' : 'Delete'}
+              {loading ? 'Requesting...' : 'Request Deletion'}
             </Button>
           </DialogFooter>
         </DialogContent>

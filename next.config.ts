@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://72.60.186.49:3000/:path*',
+        destination: `${process.env.BACKEND_URL}/:path*`,
       },
     ];
   },

@@ -194,6 +194,39 @@ export function OrderDetailsDialog({
 
           <Separator />
 
+          {order.bids && order.bids.length > 0 && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <h4 className="font-medium">Bids ({order.bids.length})</h4>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {order.bids.map((bid) => (
+                    <div key={bid.id} className="p-3 border rounded-lg">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="text-sm font-medium">${bid.amount}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Provider: {bid.serviceProviderId.slice(0, 8)}...
+                          </p>
+                        </div>
+                        <Badge variant={bid.status === 'ACCEPTED' ? 'default' : 'outline'}>
+                          {bid.status}
+                        </Badge>
+                      </div>
+                      {bid.description && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {bid.description}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          <Separator />
+
           <div className="space-y-3">
             <h4 className="font-medium">Completion Status</h4>
             <div className="grid gap-3 sm:grid-cols-3">
