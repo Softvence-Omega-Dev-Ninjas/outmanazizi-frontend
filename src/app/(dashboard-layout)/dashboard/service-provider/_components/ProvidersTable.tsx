@@ -16,6 +16,7 @@ interface ProvidersTableProps {
   onVerify: (providerId: string) => void
   onUnverify: (providerId: string) => void
   onDelete: (userId: string) => void
+  onRoleChange: (provider: ServiceProvider) => void
 }
 
 export function ProvidersTable({
@@ -26,6 +27,7 @@ export function ProvidersTable({
   onVerify,
   onUnverify,
   onDelete,
+  onRoleChange,
 }: ProvidersTableProps) {
   if (loading) {
     return <ProvidersTableSkeleton />
@@ -138,6 +140,7 @@ export function ProvidersTable({
                     onVerify={onVerify}
                     onUnverify={onUnverify}
                     onDelete={onDelete}
+                    onRoleChange={onRoleChange}
                   />
                 </td>
               </tr>

@@ -27,6 +27,7 @@ import {
   Eye,
   ShieldCheck,
   ShieldX,
+  UserCog,
 } from "lucide-react";
 import { ProviderDetailsDialog } from "./ProviderDetailsDialog";
 
@@ -37,6 +38,7 @@ interface ProviderActionsProps {
   onVerify: (providerId: string) => void;
   onUnverify: (providerId: string) => void;
   onDelete: (userId: string) => void;
+  onRoleChange: (provider: ServiceProvider) => void;
 }
 
 export function ProviderActions({
@@ -46,6 +48,7 @@ export function ProviderActions({
   onVerify,
   onUnverify,
   onDelete,
+  onRoleChange,
 }: ProviderActionsProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
@@ -96,6 +99,10 @@ export function ProviderActions({
           <DropdownMenuItem onClick={() => setShowDetailsDialog(true)}>
             <Eye className="mr-2 size-4" />
             View Details
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onRoleChange(provider)}>
+            <UserCog className="mr-2 size-4" />
+            Change Role
           </DropdownMenuItem>
           {provider.isVerifiedFromAdmin ? (
             <DropdownMenuItem onClick={handleUnverify} disabled={loading}>

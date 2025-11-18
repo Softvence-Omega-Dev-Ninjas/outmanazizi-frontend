@@ -13,6 +13,7 @@ interface UsersTableProps {
   onBlock: (userId: string) => void;
   onUnblock: (userId: string) => void;
   onDelete: (userId: string) => void;
+  onRoleChange: (user: User) => void;
 }
 
 export function UsersTable({
@@ -21,6 +22,7 @@ export function UsersTable({
   onBlock,
   onUnblock,
   onDelete,
+  onRoleChange,
 }: UsersTableProps) {
   if (loading) {
     return <UsersTableSkeleton />;
@@ -49,6 +51,9 @@ export function UsersTable({
             </th>
             <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap min-w-[100px]">
               Status
+            </th>
+            <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap min-w-[100px]">
+              Role
             </th>
             <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap min-w-[100px]">
               Verified
@@ -108,6 +113,20 @@ export function UsersTable({
                 </div>
               </td>
               <td className="p-2 align-middle whitespace-nowrap">
+                <Badge 
+                  className={
+                    user.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
+                    user.role === 'SERVICE_PROVIDER' ? 'bg-green-100 text-green-800' :
+                    user.role === 'SUPER_ADMIN' ? 'bg-red-100 text-red-800' :
+                    'bg-blue-100 text-blue-800'
+                  }
+                >
+                  {user.role === 'SERVICE_PROVIDER' ? 'Provider' : 
+                   user.role === 'SUPER_ADMIN' ? 'Super Admin' : 
+                   user.role}
+                </Badge>
+              </td>
+              <td className="p-2 align-middle whitespace-nowrap">
                 {user.isEmailVerified ? (
                   <Badge className="bg-blue-500">Verified</Badge>
                 ) : (
@@ -125,6 +144,7 @@ export function UsersTable({
                   onBlock={onBlock}
                   onUnblock={onUnblock}
                   onDelete={onDelete}
+                  onRoleChange={onRoleChange}
                 />
               </td>
             </tr>

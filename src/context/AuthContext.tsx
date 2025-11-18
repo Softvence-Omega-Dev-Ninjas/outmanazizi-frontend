@@ -9,13 +9,23 @@ import {
 } from "react";
 import { authStorage } from "@/lib/auth-storage";
 import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
+
+interface DecodedToken {
+  userId: string
+  role: string
+  exp: number
+}
 
 interface AuthContextType {
   token: string | null;
   adminInfo: any | null;
+  userRole: string | null;
   login: (token: string, adminData: any) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  isAdmin: boolean;
+  isSuperAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,11 +33,15 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [adminInfo, setAdminInfo] = useState<any | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   const logout = useCallback(() => {
     setToken(null);
     setAdminInfo(null);
+    setUserRole(null);
     authStorage.clearAuth();
+    // Clear cookie for middleware
+    document.cookie = 'token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
   }, []);
 
   useEffect(() => {
@@ -39,7 +53,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    if (savedToken) setToken(savedToken);
+    if (savedToken) {
+      setToken(savedToken);
+      try {
+        const decoded = jwtDecode<DecodedToken>(savedToken);
+        setUserRole(decoded.role);
+      } catch (error) {
+        console.error('Invalid token:', error);
+        logout();
+        return;
+      }
+    }
     if (savedAdmin) setAdminInfo(savedAdmin);
   }, [logout]);
 
@@ -57,6 +81,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setToken(newToken);
     setAdminInfo(adminData);
     authStorage.setAuth(newToken, adminData, 24);
+    
+    // Set cookie for middleware
+    document.cookie = `token=${newToken}; path=/; max-age=${24 * 60 * 60}; secure; samesite=strict`;
+    
+    // Decode token to get role
+    try {
+      const decoded = jwtDecode<DecodedToken>(newToken);
+      setUserRole(decoded.role);
+    } catch (error) {
+      console.error('Invalid token during login:', error);
+    }
   };
 
   return (
@@ -64,9 +99,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         token,
         adminInfo,
+        userRole,
         login,
         logout,
         isAuthenticated: !!token && !authStorage.isExpired(),
+        isAdmin: userRole === 'ADMIN' || userRole === 'SUPER_ADMIN',
+        isSuperAdmin: userRole === 'SUPER_ADMIN',
       }}
     >
       {children}

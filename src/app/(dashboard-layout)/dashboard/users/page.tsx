@@ -5,6 +5,7 @@ import { User } from "@/types/user";
 import { UsersTable } from "./_components/UsersTable";
 import { UsersHeader } from "./_components/UsersHeader";
 import { Pagination } from "./_components/Pagination";
+import { RoleChangeDialog } from "@/components/admin/RoleChangeDialog";
 import { useUsers, useBlockUser, useDeleteUser } from "@/hooks/useUsers";
 
 const ITEMS_PER_PAGE = 10;
@@ -20,6 +21,8 @@ export default function UsersPage() {
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [verifiedFilter, setVerifiedFilter] = useState<string[]>([]);
   const [providerFilter, setProviderFilter] = useState<string[]>([]);
+  const [selectedUserForRole, setSelectedUserForRole] = useState<User | null>(null);
+  const [showRoleDialog, setShowRoleDialog] = useState(false);
 
   const users = useMemo(() => {
     return allUsers.filter((user: User) => user.role === "CONSUMER");
@@ -108,6 +111,11 @@ export default function UsersPage() {
     deleteUserMutation.mutate(userId);
   };
 
+  const handleRoleChange = (user: User) => {
+    setSelectedUserForRole(user);
+    setShowRoleDialog(true);
+  };
+
   return (
     <div className="space-y-6">
       <UsersHeader
@@ -129,6 +137,13 @@ export default function UsersPage() {
         onBlock={handleBlock}
         onUnblock={handleUnblock}
         onDelete={handleDelete}
+        onRoleChange={handleRoleChange}
+      />
+
+      <RoleChangeDialog
+        user={selectedUserForRole}
+        open={showRoleDialog}
+        onOpenChange={setShowRoleDialog}
       />
 
       {totalPages > 1 && (
