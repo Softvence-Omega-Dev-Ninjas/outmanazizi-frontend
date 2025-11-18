@@ -154,7 +154,7 @@ export default function ServiceProviderPage() {
       id: provider.user.id,
       name: provider.user.name,
       email: provider.user.email,
-      role: provider.user.role
+      role: provider.user.role || "SERVICE_PROVIDER"
     });
     setShowRoleDialog(true);
   };
