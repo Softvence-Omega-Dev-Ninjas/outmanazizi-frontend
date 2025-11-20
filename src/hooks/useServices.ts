@@ -36,21 +36,21 @@ export function useCreateService() {
   })
 }
 
-export function useDeleteService() {
+export function useUpdateService() {
   const { token } = useAuth()
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (serviceId: string) => {
+    mutationFn: async ({ serviceId, name }: { serviceId: string; name: string }) => {
       if (!token) throw new Error('No token')
-      return serviceService.deleteService(serviceId, token)
+      return serviceService.updateService(serviceId, { name }, token)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['services'] })
-      toast.success('Service deleted successfully')
+      toast.success('Service updated successfully')
     },
     onError: () => {
-      toast.error('Failed to delete service')
+      toast.error('Failed to update service')
     },
   })
 }
@@ -70,6 +70,25 @@ export function useCreateSubService() {
     },
     onError: () => {
       toast.error('Failed to create sub-service')
+    },
+  })
+}
+
+export function useDeleteSubService() {
+  const { token } = useAuth()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (subServiceId: string) => {
+      if (!token) throw new Error('No token')
+      return serviceService.deleteSubService(subServiceId, token)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['services'] })
+      toast.success('Sub-service deleted successfully')
+    },
+    onError: () => {
+      toast.error('Failed to delete sub-service')
     },
   })
 }

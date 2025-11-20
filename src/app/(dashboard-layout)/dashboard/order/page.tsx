@@ -1,97 +1,60 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Order } from "@/types/order";
 import { Input } from "@/components/ui/input";
-import { OrdersTable } from "./_components/OrdersTable";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Eye, DollarSign, ArrowRightLeft } from "lucide-react";
+import { useOrders } from "@/hooks/useOrders";
+import { format } from "date-fns";
+import { UserCell } from "./_components/UserCell";
 import { OrderDetailsDialog } from "./_components/OrderDetailsDialog";
-import { OrderFilters } from "./_components/OrderFilters";
-import { Search } from "lucide-react";
-import { useOrders, useUpdateOrder, useDeleteOrder } from "@/hooks/useOrders";
+import { Button } from "@/components/ui/button";
 
 export default function OrderPage() {
   const { data: orders = [], isLoading } = useOrders();
-  const updateOrderMutation = useUpdateOrder();
-  const deleteOrderMutation = useDeleteOrder();
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<string[]>([]);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
 
-  // Debug: Log orders data
-  console.log("Orders Data:", orders);
-  console.log("Total Orders:", orders.length);
-  if (orders.length > 0) {
-    console.log("First Order Sample:", orders[0]);
-    console.log("Order Fields:", Object.keys(orders[0]));
-  }
+  const filteredOrders = orders.filter(
+    (order: Order) =>
+      order.id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      order.status?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  const filteredOrders = useMemo(() => {
-    let filtered = orders;
-    console.log("Filtering orders, total:", filtered.length);
+  console.log("Oders Data :", orders);
 
-    // Search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (order: Order) =>
-          order.serviceName?.toLowerCase().includes(query) ||
-          order.title?.toLowerCase().includes(query) ||
-          order.id?.toLowerCase().includes(query) ||
-          order.description?.toLowerCase().includes(query)
-      );
-    }
-
-    // Status filter - based on order completion status
-    if (statusFilter.length > 0) {
-      filtered = filtered.filter((order: Order) => {
-        if (statusFilter.includes("completed") && order.isCompletedFromAdmin)
-          return true;
-        if (
-          statusFilter.includes("pending") &&
-          !order.isCompletedFromAdmin &&
-          !order.assignedServiceProviderId &&
-          !order.isDeleteRequestToAdmin
-        )
-          return true;
-        if (
-          statusFilter.includes("in-progress") &&
-          order.assignedServiceProviderId &&
-          !order.isCompletedFromAdmin &&
-          !order.isDeleteRequestToAdmin
-        )
-          return true;
-        if (
-          statusFilter.includes("delete-request") &&
-          order.isDeleteRequestToAdmin
-        )
-          return true;
-        return false;
-      });
-    }
-
-    console.log("Filtered orders result:", filtered.length);
-    return filtered;
-  }, [orders, searchQuery, statusFilter]);
-
-  const handleViewDetails = (order: Order) => {
-    setSelectedOrder(order);
-    setShowDetailsDialog(true);
-  };
-
-  const handleApprove = (orderId: string) => {
-    updateOrderMutation.mutate({ 
-      id: orderId, 
-      data: { isCompletedFromAdmin: true } 
-    });
-  };
-
-  const handleDelete = (orderId: string) => {
-    deleteOrderMutation.mutate(orderId);
-  };
-
-  const handleResetFilters = () => {
-    setStatusFilter([]);
+  const getStatusBadge = (status: string) => {
+    const statusConfig: Record<string, { label: string; className: string }> = {
+      PENDING: {
+        label: "Pending",
+        className: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      },
+      IN_PROGRESS: {
+        label: "In Progress",
+        className: "bg-blue-100 text-blue-800 border-blue-200",
+      },
+      COMPLETED: {
+        label: "Completed",
+        className: "bg-green-100 text-green-800 border-green-200",
+      },
+      CANCELLED: {
+        label: "Cancelled",
+        className: "bg-red-100 text-red-800 border-red-200",
+      },
+    };
+    const config = statusConfig[status] || { label: status, className: "" };
+    return <Badge className={config.className}>{config.label}</Badge>;
   };
 
   return (
@@ -103,33 +66,131 @@ export default function OrderPage() {
         </p>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by service, description, or order ID..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-        <OrderFilters
-          statusFilter={statusFilter}
-          onStatusChange={setStatusFilter}
-          onReset={handleResetFilters}
+      {/* <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+        <Input
+          placeholder="Search by order ID or status..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-9"
         />
+      </div> */}
+
+      <div className="border rounded-lg">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Order ID</TableHead>
+              <TableHead>Service Provider ID</TableHead>
+              <TableHead>Consumer ID</TableHead>
+              {/* <TableHead>Payment Intent ID</TableHead> */}
+              <TableHead>Bid ID</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Created At</TableHead>
+              <TableHead className="text-center">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, idx) => (
+                <TableRow key={idx}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-20" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-8 w-8 ml-auto" />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : filteredOrders.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={8}
+                  className="text-center py-8 text-muted-foreground"
+                >
+                  No orders found
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredOrders.map((order: Order) => (
+                <TableRow key={order.id}>
+                  <TableCell className="font-mono text-xs">
+                    {order.id.slice(0, 8)}...
+                  </TableCell>
+                  <TableCell>
+                    <UserCell userId={order.serviceProviderId} />
+                  </TableCell>
+                  <TableCell>
+                    <UserCell userId={order.consumerId} />
+                  </TableCell>
+                  {/* <TableCell className="font-mono text-xs">
+                    {order.paymentIntentId}
+                  </TableCell> */}
+                  <TableCell className="font-mono text-xs">
+                    {order.bidId.slice(0, 8)}...
+                  </TableCell>
+                  <TableCell>{getStatusBadge(order.status)}</TableCell>
+                  <TableCell>
+                    {format(new Date(order.createdAt), "MMM dd, yyyy")}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex gap-2 justify-end">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedOrderId(order.id);
+                          setShowDetailsDialog(true);
+                        }}
+                      >
+                        <Eye className="mr-2 size-4" />
+                        View
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => console.log("Refund", order.id)}
+                      >
+                        <DollarSign className="mr-2 size-4" />
+                        Refund
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => console.log("Transfer", order.id)}
+                      >
+                        <ArrowRightLeft className="mr-2 size-4" />
+                        Transfer
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
 
-      <OrdersTable
-        orders={filteredOrders}
-        loading={isLoading}
-        onViewDetails={handleViewDetails}
-        onApprove={handleApprove}
-        onDelete={handleDelete}
-      />
-
       <OrderDetailsDialog
-        order={selectedOrder}
+        orderId={selectedOrderId}
         open={showDetailsDialog}
         onOpenChange={setShowDetailsDialog}
       />

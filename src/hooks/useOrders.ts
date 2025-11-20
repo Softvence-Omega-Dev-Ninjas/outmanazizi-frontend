@@ -1,7 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { orderService } from '@/services/orderService'
 import { useAuth } from '@/context/AuthContext'
-import { toast } from 'sonner'
 
 export function useOrders() {
   const { token } = useAuth()
@@ -17,54 +16,16 @@ export function useOrders() {
   })
 }
 
-export function useOrder(id: string) {
+export function useOrderDetails(orderId: string | null) {
   const { token } = useAuth()
 
   return useQuery({
-    queryKey: ['order', id],
+    queryKey: ['order-details', orderId],
     queryFn: async () => {
-      if (!token) throw new Error('No token')
-      const response = await orderService.getOrderById(id, token)
+      if (!token || !orderId) throw new Error('No token or orderId')
+      const response = await orderService.getOrderDetails(orderId, token)
       return response.data
     },
-    enabled: !!token && !!id,
-  })
-}
-
-export function useUpdateOrder() {
-  const queryClient = useQueryClient()
-  const { token } = useAuth()
-
-  return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      if (!token) throw new Error('No token')
-      return orderService.updateOrder(id, data, token)
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] })
-      toast.success('Order updated successfully')
-    },
-    onError: () => {
-      toast.error('Failed to update order')
-    },
-  })
-}
-
-export function useDeleteOrder() {
-  const queryClient = useQueryClient()
-  const { token } = useAuth()
-
-  return useMutation({
-    mutationFn: async (orderId: string) => {
-      if (!token) throw new Error('No token')
-      return orderService.deleteOrder(orderId, token)
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] })
-      toast.success('Order deletion requested successfully')
-    },
-    onError: () => {
-      toast.error('Failed to request order deletion')
-    },
+    enabled: !!token && !!orderId,
   })
 }

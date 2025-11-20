@@ -53,13 +53,15 @@ export default function LoginForm() {
 
   return (
     <div className="space-y-4 w-full max-w-md">
-      <div className="border p-4 rounded-md bg-muted/50">
-        <p className="text-sm font-medium mb-2">Test Credentials:</p>
-        <p className="text-xs text-muted-foreground">
-          Email: superadmin@example.com
-        </p>
-        <p className="text-xs text-muted-foreground">Password: 12345678</p>
-      </div>
+      {process.env.NODE_ENV === "development" && (
+        <div className="border p-4 rounded-md bg-muted/50">
+          <p className="text-sm font-medium mb-2">Test Credentials:</p>
+          <p className="text-xs text-muted-foreground">
+            Email: superadmin@example.com
+          </p>
+          <p className="text-xs text-muted-foreground">Password: 12345678</p>
+        </div>
+      )}
       <form
         onSubmit={handleSubmit}
         className="border p-6 rounded-md shadow-md flex flex-col justify-center space-y-4"

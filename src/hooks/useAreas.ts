@@ -35,3 +35,41 @@ export function useCreateArea() {
     },
   })
 }
+
+export function useUpdateArea() {
+  const { token } = useAuth()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ locationId, area }: { locationId: string; area: string }) => {
+      if (!token) throw new Error('No token')
+      return areaService.updateArea(locationId, { area }, token)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['areas'] })
+      toast.success('Area updated successfully')
+    },
+    onError: () => {
+      toast.error('Failed to update area')
+    },
+  })
+}
+
+export function useDeleteArea() {
+  const { token } = useAuth()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (locationId: string) => {
+      if (!token) throw new Error('No token')
+      return areaService.deleteArea(locationId, token)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['areas'] })
+      toast.success('Area deleted successfully')
+    },
+    onError: () => {
+      toast.error('Failed to delete area')
+    },
+  })
+}
