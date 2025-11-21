@@ -1,10 +1,12 @@
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:8080/api" ||
-  "http://72.60.186.49:3000/api";
-
+  process.env.NEXT_PUBLIC_BACKEND_URL;
 export const api = {
   get: async (endpoint: string, token?: string) => {
+      if(!API_BASE_URL) {
+          return new Promise((resolve, reject) => {
+              reject("BACKEND_URL not found");
+          })
+      }
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers: {
         "Content-Type": "application/json",
@@ -16,6 +18,11 @@ export const api = {
   },
 
   post: async (endpoint: string, data: any, token?: string) => {
+      if(!API_BASE_URL) {
+          return new Promise((resolve, reject) => {
+              reject("BACKEND_URL not found");
+          })
+      }
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: "POST",
       headers: {
@@ -29,6 +36,11 @@ export const api = {
   },
 
   patch: async (endpoint: string, data?: any, token?: string) => {
+      if(!API_BASE_URL) {
+          return new Promise((resolve, reject) => {
+              reject("BACKEND_URL not found");
+          })
+      }
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: "PATCH",
       headers: {
@@ -42,6 +54,11 @@ export const api = {
   },
 
   delete: async (endpoint: string, token?: string) => {
+      if(!API_BASE_URL) {
+          return new Promise((resolve, reject) => {
+              reject("BACKEND_URL not found");
+          })
+      }
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: "DELETE",
       headers: {
