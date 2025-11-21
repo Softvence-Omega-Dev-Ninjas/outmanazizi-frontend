@@ -8,7 +8,12 @@ import { UpdateAreaDialog } from "./_components/UpdateAreaDialog";
 import { DeleteAreaDialog } from "./_components/DeleteAreaDialog";
 import { AreasSkeleton } from "./_components/AreasSkeleton";
 import { Search, Plus, Pencil, Trash2, MapPin, Calendar } from "lucide-react";
-import { useAreas, useCreateArea, useUpdateArea, useDeleteArea } from "@/hooks/useAreas";
+import {
+  useAreas,
+  useCreateArea,
+  useUpdateArea,
+  useDeleteArea,
+} from "@/hooks/useAreas";
 import { Area } from "@/types/area";
 
 export default function AreasPage() {
@@ -68,11 +73,13 @@ export default function AreasPage() {
             >
               <div className="flex items-start justify-between gap-3 mb-4">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="flex-shrink-0 size-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <div className="shrink-0 size-10 rounded-lg bg-primary/10 flex items-center justify-center">
                     <MapPin className="size-5 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-lg truncate">{area.area}</h3>
+                    <h3 className="font-semibold text-lg truncate">
+                      {area.area}
+                    </h3>
                   </div>
                 </div>
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -102,7 +109,13 @@ export default function AreasPage() {
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Calendar className="size-3.5" />
-                <span>{new Date(area.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                <span>
+                  {new Date(area.createdAt).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
               </div>
             </div>
           ))}
@@ -118,7 +131,9 @@ export default function AreasPage() {
       <UpdateAreaDialog
         open={showUpdateDialog}
         onOpenChange={setShowUpdateDialog}
-        onSubmit={(locationId, area) => updateAreaMutation.mutate({ locationId, area })}
+        onSubmit={(locationId, area) =>
+          updateAreaMutation.mutate({ locationId, area })
+        }
         area={selectedArea}
       />
 

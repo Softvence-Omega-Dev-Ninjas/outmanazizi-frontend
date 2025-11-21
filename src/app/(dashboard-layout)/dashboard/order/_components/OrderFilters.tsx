@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -6,17 +6,21 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Filter } from 'lucide-react'
+} from "@/components/ui/dropdown-menu";
+import { Filter } from "lucide-react";
 
 interface OrderFiltersProps {
-  statusFilter: string[]
-  onStatusChange: (status: string[]) => void
-  onReset: () => void
+  statusFilter: string[];
+  onStatusChange: (status: string[]) => void;
+  onReset: () => void;
 }
 
-export function OrderFilters({ statusFilter, onStatusChange, onReset }: OrderFiltersProps) {
-  const hasFilters = statusFilter.length > 0
+export function OrderFilters({
+  statusFilter,
+  onStatusChange,
+  onReset,
+}: OrderFiltersProps) {
+  const hasFilters = statusFilter.length > 0;
 
   return (
     <div className="flex items-center gap-2">
@@ -31,49 +35,49 @@ export function OrderFilters({ statusFilter, onStatusChange, onReset }: OrderFil
           <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuCheckboxItem
-            checked={statusFilter.includes('pending')}
+            checked={statusFilter.includes("pending")}
             onCheckedChange={(checked) => {
               onStatusChange(
                 checked
-                  ? [...statusFilter, 'pending']
-                  : statusFilter.filter((s) => s !== 'pending')
-              )
+                  ? [...statusFilter, "pending"]
+                  : statusFilter.filter((s) => s !== "pending")
+              );
             }}
           >
             Pending
           </DropdownMenuCheckboxItem>
           <DropdownMenuCheckboxItem
-            checked={statusFilter.includes('in-progress')}
+            checked={statusFilter.includes("in-progress")}
             onCheckedChange={(checked) => {
               onStatusChange(
                 checked
-                  ? [...statusFilter, 'in-progress']
-                  : statusFilter.filter((s) => s !== 'in-progress')
-              )
+                  ? [...statusFilter, "in-progress"]
+                  : statusFilter.filter((s) => s !== "in-progress")
+              );
             }}
           >
             In Progress
           </DropdownMenuCheckboxItem>
           <DropdownMenuCheckboxItem
-            checked={statusFilter.includes('completed')}
+            checked={statusFilter.includes("completed")}
             onCheckedChange={(checked) => {
               onStatusChange(
                 checked
-                  ? [...statusFilter, 'completed']
-                  : statusFilter.filter((s) => s !== 'completed')
-              )
+                  ? [...statusFilter, "completed"]
+                  : statusFilter.filter((s) => s !== "completed")
+              );
             }}
           >
             Completed
           </DropdownMenuCheckboxItem>
           <DropdownMenuCheckboxItem
-            checked={statusFilter.includes('delete-request')}
+            checked={statusFilter.includes("delete-request")}
             onCheckedChange={(checked) => {
               onStatusChange(
                 checked
-                  ? [...statusFilter, 'delete-request']
-                  : statusFilter.filter((s) => s !== 'delete-request')
-              )
+                  ? [...statusFilter, "delete-request"]
+                  : statusFilter.filter((s) => s !== "delete-request")
+              );
             }}
           >
             Delete Request
@@ -87,5 +91,5 @@ export function OrderFilters({ statusFilter, onStatusChange, onReset }: OrderFil
         </Button>
       )}
     </div>
-  )
+  );
 }

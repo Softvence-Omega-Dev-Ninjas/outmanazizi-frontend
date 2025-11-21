@@ -40,7 +40,9 @@ export default function NotificationsPage() {
               <div className="size-16 rounded-full bg-muted flex items-center justify-center mb-4">
                 <Inbox className="size-8 text-muted-foreground" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">No notifications yet</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                No notifications yet
+              </h3>
               <p className="text-sm text-muted-foreground">
                 When you receive notifications, they will appear here
               </p>
@@ -48,16 +50,23 @@ export default function NotificationsPage() {
           </Card>
         ) : (
           notifications.map((notification: Notification) => (
-            <Card key={notification.id} className="hover:shadow-md transition-shadow">
+            <Card
+              key={notification.id}
+              className="hover:shadow-md transition-shadow"
+            >
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
-                  <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                     <Bell className="size-5 text-primary" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium">{notification.message}</p>
+                    <p className="text-sm font-medium">
+                      {notification.message}
+                    </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
+                      {formatDistanceToNow(new Date(notification.createdAt), {
+                        addSuffix: true,
+                      })}
                     </p>
                   </div>
                 </div>

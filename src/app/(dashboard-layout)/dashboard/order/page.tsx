@@ -18,6 +18,8 @@ import { useOrders } from "@/hooks/useOrders";
 import { format } from "date-fns";
 import { UserCell } from "./_components/UserCell";
 import { OrderDetailsDialog } from "./_components/OrderDetailsDialog";
+import { RefundDialog } from "./_components/RefundDialog";
+import { TransferDialog } from "./_components/TransferDialog";
 import { Button } from "@/components/ui/button";
 
 export default function OrderPage() {
@@ -25,6 +27,8 @@ export default function OrderPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [showRefundDialog, setShowRefundDialog] = useState(false);
+  const [showTransferDialog, setShowTransferDialog] = useState(false);
 
   const filteredOrders = orders.filter(
     (order: Order) =>
@@ -167,7 +171,10 @@ export default function OrderPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => console.log("Refund", order.id)}
+                        onClick={() => {
+                          setSelectedOrderId(order.id);
+                          setShowRefundDialog(true);
+                        }}
                       >
                         <DollarSign className="mr-2 size-4" />
                         Refund
@@ -175,7 +182,10 @@ export default function OrderPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => console.log("Transfer", order.id)}
+                        onClick={() => {
+                          setSelectedOrderId(order.id);
+                          setShowTransferDialog(true);
+                        }}
                       >
                         <ArrowRightLeft className="mr-2 size-4" />
                         Transfer
@@ -193,6 +203,18 @@ export default function OrderPage() {
         orderId={selectedOrderId}
         open={showDetailsDialog}
         onOpenChange={setShowDetailsDialog}
+      />
+
+      <RefundDialog
+        orderId={selectedOrderId}
+        open={showRefundDialog}
+        onOpenChange={setShowRefundDialog}
+      />
+
+      <TransferDialog
+        orderId={selectedOrderId}
+        open={showTransferDialog}
+        onOpenChange={setShowTransferDialog}
       />
     </div>
   );

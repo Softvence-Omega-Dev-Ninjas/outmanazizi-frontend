@@ -10,7 +10,8 @@ interface UserCellProps {
 
 export function UserCell({ userId }: UserCellProps) {
   const { data: users = [], isLoading: usersLoading } = useUsers();
-  const { data: serviceProviders = [], isLoading: spLoading } = useServiceProviders();
+  const { data: serviceProviders = [], isLoading: spLoading } =
+    useServiceProviders();
 
   if (usersLoading || spLoading) {
     return <Skeleton className="h-4 w-32" />;
@@ -18,7 +19,7 @@ export function UserCell({ userId }: UserCellProps) {
 
   // Check in consumers first
   let user = users.find((u: any) => u.id === userId);
-  
+
   // If not found, check in service providers using main id field
   if (!user) {
     const sp = serviceProviders.find((sp: any) => sp.id === userId);

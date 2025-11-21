@@ -19,7 +19,7 @@ export function OrdersTableSkeleton() {
             <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap min-w-[120px]">
               Status
             </th>
-            <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap min-w-[80px]">
+            <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap min-w-20">
               Bids
             </th>
             <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap min-w-[120px]">
