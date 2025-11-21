@@ -7,3 +7,9 @@ services:
       - .env
     image: softvence/outmanazizi-web:latest
     container_name: outmanazizi-web
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
