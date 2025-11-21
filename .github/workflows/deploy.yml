@@ -86,13 +86,13 @@ jobs:
           script: |
             cd ~/${{ secrets.PACKAGE_NAME }}
             # Pull the latest images
-            docker compose --profile prod pull
+            docker compose pull
 
             # Stop and remove existing containers safely
-            docker compose --profile prod down --remove-orphans
+            docker compose down --remove-orphans
 
             # Start containers in detached mode
-            docker compose --profile prod up -d
+            docker compose up -d
 
             # Prune unused Docker objects (optional, cleans disk)
             docker system prune -f

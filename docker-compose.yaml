@@ -5,3 +5,5 @@ services:
       - "3000:3000"
     env_file:
       - .env
+    image: softvence/outmanazizi-web:latest
+    container_name: outmanazizi-web
