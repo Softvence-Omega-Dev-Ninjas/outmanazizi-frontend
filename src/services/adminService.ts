@@ -16,4 +16,12 @@ export const adminService = {
   deleteUser: async (userId: string, token: string): Promise<any> => {
     return api.patch(`/admin/delete/${userId}`, {}, token)
   },
+  
+  getServiceDetails: async (serviceId: string, token: string): Promise<any> => {
+    return api.get(`/admin/service-details/${serviceId}`, token)
+  },
+  
+  getAreaDetails: async (areaId: string, token: string): Promise<any> => {
+    return api.get(`/admin/area-details/${areaId}`, token)
+  },
 }

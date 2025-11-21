@@ -10,6 +10,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
+import { ServiceCategoryName } from '@/components/admin/ServiceCategoryName'
+import { AreaName } from '@/components/admin/AreaName'
 import { format } from 'date-fns'
 import { Mail, Phone, MapPin, Calendar, Shield, CheckCircle, XCircle, Star, Briefcase } from 'lucide-react'
 
@@ -112,20 +114,20 @@ export function ProviderDetailsDialog({ provider, open, onOpenChange }: Provider
               <div>
                 <p className="text-sm font-medium mb-2">Service Categories</p>
                 <div className="flex flex-wrap gap-2">
-                  {provider.serviceCategories.map((category, idx) => (
-                    <Badge key={idx} variant="secondary">
-                      {category}
-                    </Badge>
+                  {provider.serviceCategories.map((categoryId, idx) => (
+                    <ServiceCategoryName key={idx} serviceId={categoryId} />
                   ))}
                 </div>
               </div>
               <div>
                 <p className="text-sm font-medium mb-2">Service Areas</p>
-                <div className="flex flex-wrap gap-2">
-                  {provider.serviceArea.map((area, idx) => (
-                    <Badge key={idx} variant="outline">
-                      {area}
-                    </Badge>
+                <div className="space-y-1">
+                  {provider.serviceArea.map((areaId, idx) => (
+                    <div key={idx} className="inline-block mr-2">
+                      <Badge variant="outline">
+                        <AreaName areaId={areaId} />
+                      </Badge>
+                    </div>
                   ))}
                 </div>
               </div>

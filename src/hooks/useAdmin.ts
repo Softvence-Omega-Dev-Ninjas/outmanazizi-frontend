@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { adminService } from '@/services/adminService'
 import { useAuth } from '@/context/AuthContext'
 import { toast } from 'sonner'
@@ -79,5 +79,33 @@ export function useDeleteUser() {
     onError: () => {
       toast.error('Failed to delete user')
     },
+  })
+}
+
+export function useServiceDetails(serviceId: string) {
+  const { token } = useAuth()
+
+  return useQuery({
+    queryKey: ['service-details', serviceId],
+    queryFn: async () => {
+      if (!token) throw new Error('No token')
+      const response = await adminService.getServiceDetails(serviceId, token)
+      return response.data
+    },
+    enabled: !!token && !!serviceId,
+  })
+}
+
+export function useAreaDetails(areaId: string) {
+  const { token } = useAuth()
+
+  return useQuery({
+    queryKey: ['area-details', areaId],
+    queryFn: async () => {
+      if (!token) throw new Error('No token')
+      const response = await adminService.getAreaDetails(areaId, token)
+      return response.data
+    },
+    enabled: !!token && !!areaId,
   })
 }
