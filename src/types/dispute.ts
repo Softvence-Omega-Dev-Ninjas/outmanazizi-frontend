@@ -13,14 +13,14 @@ export interface Dispute {
     name: string
     email: string
     phone: string
-    picture: string
+    picture: string | null
   }
   against?: {
     id: string
     name: string
     email: string
     phone: string
-    picture: string
+    picture: string | null
   }
   service?: {
     id: string

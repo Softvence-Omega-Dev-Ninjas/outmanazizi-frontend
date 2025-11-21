@@ -13,7 +13,8 @@ import { Search, Plus } from "lucide-react";
 import {
   useServices,
   useCreateService,
-  useDeleteService,
+  useUpdateService,
+  useDeleteSubService,
   useCreateSubService,
 } from "@/hooks/useServices";
 import { Service } from "@/types/service";
@@ -21,7 +22,8 @@ import { Service } from "@/types/service";
 export default function ServicesPage() {
   const { data: services = [], isLoading } = useServices();
   const createServiceMutation = useCreateService();
-
+  const updateServiceMutation = useUpdateService();
+  const deleteSubServiceMutation = useDeleteSubService();
   const createSubServiceMutation = useCreateSubService();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -44,21 +46,21 @@ export default function ServicesPage() {
             Manage service categories and sub-services ({services.length} total)
           </p>
         </div>
-        <Button onClick={() => setShowCreateDialog(true)}>
+        <Button onClick={() => setShowCreateDialog(true)} className="bg-green-600 hover:bg-green-700">
           <Plus className="mr-2 size-4" />
           Add Service
         </Button>
       </div>
 
-      {/* <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-500" />
         <Input
           placeholder="Search services..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9"
+          className="pl-9 border-blue-200 focus:border-blue-400"
         />
-      </div> */}
+      </div>
 
       {isLoading ? (
         <ServicesSkeleton />
@@ -85,11 +87,10 @@ export default function ServicesPage() {
               }}
               onEditSubService={() => {}}
               onDeleteSubService={(serviceId, subServiceId) => {
-                // TODO: Add delete sub-service API endpoint when available
                 if (
                   confirm("Are you sure you want to delete this sub-service?")
                 ) {
-                  console.log("Delete sub-service:", serviceId, subServiceId);
+                  deleteSubServiceMutation.mutate(subServiceId);
                 }
               }}
             />
@@ -109,8 +110,12 @@ export default function ServicesPage() {
           onOpenChange={setShowEditDialog}
           serviceName={selectedService.name}
           onSubmit={(name) => {
-            // TODO: Add edit API endpoint when available
-            console.log("Edit service:", selectedService.id, name);
+            updateServiceMutation.mutate(
+              { serviceId: selectedService.id, name },
+              {
+                onSuccess: () => setShowEditDialog(false)
+              }
+            );
           }}
         />
       )}

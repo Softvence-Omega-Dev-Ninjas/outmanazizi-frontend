@@ -19,7 +19,7 @@ export default function DisputesPage() {
   const deleteDisputeMutation = useDeleteDispute();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
-  const [selectedDispute, setSelectedDispute] = useState<Dispute | null>(null);
+  const [selectedDisputeId, setSelectedDisputeId] = useState<string | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
 
   console.log(disputes);
@@ -51,7 +51,7 @@ export default function DisputesPage() {
   }, [disputes, searchQuery, statusFilter]);
 
   const handleViewDetails = (dispute: Dispute) => {
-    setSelectedDispute(dispute);
+    setSelectedDisputeId(dispute.id);
     setShowDetailsDialog(true);
   };
 
@@ -76,8 +76,8 @@ export default function DisputesPage() {
         </p>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1 max-w-md">
+      <div className="flex flex-col sm:flex-row gap-4 justify-end">
+        {/* <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             placeholder="Search by details, dispute ID, or service ID..."
@@ -85,7 +85,7 @@ export default function DisputesPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
           />
-        </div>
+        </div> */}
         <DisputeFilters
           statusFilter={statusFilter}
           onStatusChange={setStatusFilter}
@@ -102,7 +102,7 @@ export default function DisputesPage() {
       />
 
       <DisputeDetailsDialog
-        dispute={selectedDispute}
+        disputeId={selectedDisputeId}
         open={showDetailsDialog}
         onOpenChange={setShowDetailsDialog}
       />

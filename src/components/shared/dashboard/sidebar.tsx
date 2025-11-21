@@ -29,50 +29,50 @@ const sidebarItems = [
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-    roles: ['ADMIN', 'SUPER_ADMIN'],
+    roles: ["ADMIN", "SUPER_ADMIN"],
   },
   {
-    title: "Users",
+    title: "Consumers",
     href: "/dashboard/users",
     icon: Users,
-    roles: ['ADMIN', 'SUPER_ADMIN'],
+    roles: ["ADMIN", "SUPER_ADMIN"],
   },
   {
     title: "Service Providers",
     href: "/dashboard/service-provider",
     icon: UserCheck,
-    roles: ['ADMIN', 'SUPER_ADMIN'],
+    roles: ["ADMIN", "SUPER_ADMIN"],
   },
   {
     title: "Services",
     href: "/dashboard/services",
     icon: Briefcase,
-    roles: ['ADMIN', 'SUPER_ADMIN'],
+    roles: ["ADMIN", "SUPER_ADMIN"],
   },
   {
     title: "Areas",
     href: "/dashboard/areas",
     icon: MapPin,
-    roles: ['SUPER_ADMIN'], // Only super admin can manage areas
+    roles: ["SUPER_ADMIN"], // Only super admin can manage areas
   },
   {
     title: "Orders",
     href: "/dashboard/order",
     icon: ShoppingCart,
-    roles: ['ADMIN', 'SUPER_ADMIN'],
+    roles: ["ADMIN", "SUPER_ADMIN"],
   },
   {
     title: "Disputes",
     href: "/dashboard/disputes",
     icon: Shield,
-    roles: ['ADMIN', 'SUPER_ADMIN'],
+    roles: ["ADMIN", "SUPER_ADMIN"],
   },
-  {
-    title: "Transfers",
-    href: "/dashboard/transfer",
-    icon: ArrowRightLeft,
-    roles: ['SUPER_ADMIN'], // Only super admin can manage transfers
-  },
+  // {
+  //   title: "Transfers",
+  //   href: "/dashboard/transfer",
+  //   icon: ArrowRightLeft,
+  //   roles: ["SUPER_ADMIN"], // Only super admin can manage transfers
+  // },
 ];
 
 interface SidebarProps {
@@ -104,10 +104,10 @@ export function Sidebar({ className }: SidebarProps) {
             </Avatar>
             <div>
               <h2 className="text-lg font-semibold">
-                {adminInfo?.name || 'Admin'}
+                {adminInfo?.name || "Admin"}
               </h2>
               <p className="text-sm text-muted-foreground">
-                {userRole === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}
+                {userRole === "SUPER_ADMIN" ? "Super Admin" : "Admin"}
               </p>
             </div>
           </div>

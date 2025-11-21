@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
       {
         source: "/api/:path*",
         destination: `${
-          process.env.BACKEND_URL || "http://72.60.186.49:3000"
+          process.env.BACKEND_URL || "https://api.m3alem.group"
         }/:path*`,
       },
     ];

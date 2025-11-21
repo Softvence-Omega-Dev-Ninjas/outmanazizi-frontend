@@ -34,6 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [adminInfo, setAdminInfo] = useState<any | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const logout = useCallback(() => {
     setToken(null);
@@ -50,6 +51,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (authStorage.isExpired()) {
       logout();
+      setIsLoading(false);
       return;
     }
 
@@ -61,10 +63,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch (error) {
         console.error('Invalid token:', error);
         logout();
+        setIsLoading(false);
         return;
       }
     }
     if (savedAdmin) setAdminInfo(savedAdmin);
+    setIsLoading(false);
   }, [logout]);
 
   useEffect(() => {
@@ -93,6 +97,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('Invalid token during login:', error);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-2 text-sm text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <AuthContext.Provider

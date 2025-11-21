@@ -1,262 +1,257 @@
 "use client";
 
-import { Order } from "@/types/order";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { useOrderDetails } from "@/hooks/useOrders";
 import { format } from "date-fns";
 import {
   User,
-  Briefcase,
-  MapPin,
   DollarSign,
   Calendar,
-  Clock,
-  Wrench,
+  MapPin,
   FileText,
-  CheckCircle,
-  XCircle,
+  Star,
+  Image as ImageIcon,
 } from "lucide-react";
 
 interface OrderDetailsDialogProps {
-  order: Order | null;
+  orderId: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export function OrderDetailsDialog({
-  order,
+  orderId,
   open,
   onOpenChange,
 }: OrderDetailsDialogProps) {
-  if (!order) return null;
+  const { data: order, isLoading } = useOrderDetails(orderId);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl! max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Order Details</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-xl font-semibold">{order.title}</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Order ID: {order.id}
-            </p>
-            <div className="flex gap-2 mt-2">
-              {order.isCompletedFromAdmin && (
-                <Badge className="bg-green-500">Completed</Badge>
-              )}
-              {order.isDeleteRequestToAdmin && (
-                <Badge variant="destructive">Delete Request</Badge>
-              )}
-              {order.assignedServiceProviderId &&
-                !order.isCompletedFromAdmin && (
-                  <Badge className="bg-blue-500">In Progress</Badge>
-                )}
-              {!order.assignedServiceProviderId &&
-                !order.isCompletedFromAdmin && (
-                  <Badge variant="outline">Pending</Badge>
-                )}
-            </div>
+        {isLoading ? (
+          <div className="space-y-4">
+            <Skeleton className="h-20 w-full" />
+            <Skeleton className="h-40 w-full" />
+            <Skeleton className="h-40 w-full" />
           </div>
-
-          <Separator />
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="flex items-start gap-3">
-              <User className="size-5 text-muted-foreground mt-0.5" />
+        ) : order ? (
+          <div className="space-y-6">
+            {/* Order Info */}
+            <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <p className="text-sm font-medium">Customer</p>
-                <p className="text-sm text-muted-foreground">
-                  User ID: {order.userId}
-                </p>
+                <p className="text-sm text-muted-foreground">Order ID</p>
+                <p className="font-mono text-sm">{order.id}</p>
               </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <Briefcase className="size-5 text-muted-foreground mt-0.5" />
               <div>
-                <p className="text-sm font-medium">Service</p>
-                <p className="text-sm text-muted-foreground">
-                  {order.serviceName}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {order.subServices}
-                </p>
+                <p className="text-sm text-muted-foreground">Status</p>
+                <Badge
+                  className={
+                    order.status === "COMPLETED"
+                      ? "bg-green-100 text-green-800"
+                      : order.status === "IN_PROGRESS"
+                      ? "bg-blue-100 text-blue-800"
+                      : "bg-yellow-100 text-yellow-800"
+                  }
+                >
+                  {order.status}
+                </Badge>
               </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <MapPin className="size-5 text-muted-foreground mt-0.5" />
               <div>
-                <p className="text-sm font-medium">Location</p>
-                <p className="text-sm text-muted-foreground">
-                  {order.location}
-                </p>
+                <p className="text-sm text-muted-foreground">Payment Intent</p>
+                <p className="font-mono text-xs">{order.paymentIntentId}</p>
               </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <DollarSign className="size-5 text-muted-foreground mt-0.5" />
               <div>
-                <p className="text-sm font-medium">Budget</p>
-                <p className="text-sm text-muted-foreground">${order.budget}</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <Calendar className="size-5 text-muted-foreground mt-0.5" />
-              <div>
-                <p className="text-sm font-medium">Start Time</p>
-                <p className="text-sm text-muted-foreground">
-                  {order.startTime}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <Clock className="size-5 text-muted-foreground mt-0.5" />
-              <div>
-                <p className="text-sm font-medium">End Time</p>
-                <p className="text-sm text-muted-foreground">{order.endTime}</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <Wrench className="size-5 text-muted-foreground mt-0.5" />
-              <div>
-                <p className="text-sm font-medium">Tools Required</p>
-                <p className="text-sm text-muted-foreground">
-                  {order.toolsNeed ? "Yes" : "No"}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <Calendar className="size-5 text-muted-foreground mt-0.5" />
-              <div>
-                <p className="text-sm font-medium">Created</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground">Created At</p>
+                <p className="text-sm">
                   {format(new Date(order.createdAt), "PPP")}
                 </p>
               </div>
             </div>
-          </div>
 
-          <Separator />
+            <Separator />
 
-          <div className="space-y-3">
-            <div className="flex items-start gap-3">
-              <FileText className="size-5 text-muted-foreground mt-0.5" />
-              <div className="flex-1">
-                <p className="text-sm font-medium">Description</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {order.description}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {order.assignedServiceProviderId && (
-            <>
-              <Separator />
-              <div className="space-y-3">
-                <h4 className="font-medium">Assigned Provider</h4>
-                <p className="text-sm text-muted-foreground">
-                  Provider ID: {order.assignedServiceProviderId}
-                </p>
-              </div>
-            </>
-          )}
-
-          {order.file.length > 0 && (
-            <>
-              <Separator />
-              <div className="space-y-3">
-                <h4 className="font-medium">Attachments</h4>
-                <div className="flex flex-wrap gap-2">
-                  {order.file.map((file, idx) => (
-                    <Badge key={idx} variant="outline">
-                      File {idx + 1}
-                    </Badge>
-                  ))}
+            {/* Service Details */}
+            <div>
+              <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+                <FileText className="size-5" />
+                Service Details
+              </h3>
+              <div className="space-y-3 bg-muted/50 p-4 rounded-lg">
+                <div>
+                  <p className="text-sm font-medium">
+                    {order.bid.service.serviceName}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {order.bid.service.description}
+                  </p>
                 </div>
-              </div>
-            </>
-          )}
-
-          <Separator />
-
-          {order.bids && order.bids.length > 0 && (
-            <>
-              <Separator />
-              <div className="space-y-3">
-                <h4 className="font-medium">Bids ({order.bids.length})</h4>
-                <div className="space-y-2 max-h-40 overflow-y-auto">
-                  {order.bids.map((bid) => (
-                    <div key={bid.id} className="p-3 border rounded-lg">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="text-sm font-medium">${bid.amount}</p>
-                          <p className="text-xs text-muted-foreground">
-                            Provider: {bid.serviceProviderId.slice(0, 8)}...
-                          </p>
-                        </div>
-                        <Badge variant={bid.status === 'ACCEPTED' ? 'default' : 'outline'}>
-                          {bid.status}
-                        </Badge>
-                      </div>
-                      {bid.description && (
-                        <p className="text-xs text-muted-foreground mt-2">
-                          {bid.description}
-                        </p>
-                      )}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="size-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Budget</p>
+                      <p className="text-sm font-medium">
+                        ${order.bid.service.budget}
+                      </p>
                     </div>
-                  ))}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="size-4 text-green-600" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">Bid Price</p>
+                      <p className="text-sm font-medium text-green-600">
+                        ${order.bid.price}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="size-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">
+                        Start Time
+                      </p>
+                      <p className="text-sm">
+                        {order.bid.service.startTime
+                          .replace(":00Z", "")
+                          .replace("T", " ")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="size-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-xs text-muted-foreground">End Time</p>
+                      <p className="text-sm">
+                        {order.bid.service.endTime
+                          .replace(":00Z", "")
+                          .replace("T", " ")}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
-
-          <Separator />
-
-          <div className="space-y-3">
-            <h4 className="font-medium">Completion Status</h4>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="flex items-center gap-2">
-                {order.isCompletedFromServiceProvider ? (
-                  <CheckCircle className="size-4 text-green-500" />
-                ) : (
-                  <XCircle className="size-4 text-muted-foreground" />
+                {order.bid.serviceProviderProposal && (
+                  <div className="mt-3 pt-3 border-t">
+                    <p className="text-xs text-muted-foreground mb-1">
+                      Service Provider Proposal
+                    </p>
+                    <p className="text-sm italic">
+                      &quot;{order.bid.serviceProviderProposal}&quot;
+                    </p>
+                  </div>
                 )}
-                <span className="text-sm">Provider</span>
-              </div>
-              <div className="flex items-center gap-2">
-                {order.isCompleteFromConsumer ? (
-                  <CheckCircle className="size-4 text-green-500" />
-                ) : (
-                  <XCircle className="size-4 text-muted-foreground" />
-                )}
-                <span className="text-sm">Consumer</span>
-              </div>
-              <div className="flex items-center gap-2">
-                {order.isCompletedFromAdmin ? (
-                  <CheckCircle className="size-4 text-green-500" />
-                ) : (
-                  <XCircle className="size-4 text-muted-foreground" />
-                )}
-                <span className="text-sm">Admin</span>
               </div>
             </div>
+
+            <Separator />
+
+            {/* Service Provider & Consumer */}
+            <div className="grid gap-6 sm:grid-cols-2">
+              <div>
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <User className="size-5" />
+                  Service Provider
+                </h3>
+                <div className="space-y-2 bg-muted/50 p-4 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    {order.bid.serviceProvider.user.picture && (
+                      <img
+                        src={order.bid.serviceProvider.user.picture}
+                        alt=""
+                        className="size-12 rounded-full object-cover"
+                      />
+                    )}
+                    <div>
+                      <p className="font-medium">
+                        {order.bid.serviceProvider.user.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {order.bid.serviceProvider.user.email}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Star className="size-4 text-yellow-500 fill-yellow-500" />
+                    <span className="text-sm">
+                      {order.bid.serviceProvider.myCurrentRating} (
+                      {order.bid.serviceProvider.ratingGetFromUsers} reviews)
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="size-4 text-muted-foreground" />
+                    <span className="text-sm">
+                      {order.bid.serviceProvider.address}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <User className="size-5" />
+                  Consumer
+                </h3>
+                <div className="space-y-2 bg-muted/50 p-4 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    {order.consumer.picture && (
+                      <img
+                        src={order.consumer.picture}
+                        alt=""
+                        className="size-12 rounded-full object-cover"
+                      />
+                    )}
+                    <div>
+                      <p className="font-medium">{order.consumer.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {order.consumer.email}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-sm">{order.consumer.phone}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Service Images */}
+            {order.bid.service.file && order.bid.service.file.length > 0 && (
+              <>
+                <Separator />
+                <div>
+                  <h3 className="font-semibold mb-3 flex items-center gap-2">
+                    <ImageIcon className="size-5" />
+                    Service Images
+                  </h3>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {order.bid.service.file.map((img: string, idx: number) => (
+                      <img
+                        key={idx}
+                        src={img}
+                        alt={`Service ${idx + 1}`}
+                        className="w-full h-32 object-cover rounded-lg border"
+                      />
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
-        </div>
+        ) : (
+          <p className="text-center text-muted-foreground py-8">
+            No order details found
+          </p>
+        )}
       </DialogContent>
     </Dialog>
   );

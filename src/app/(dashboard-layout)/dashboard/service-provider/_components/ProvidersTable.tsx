@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ProviderActions } from './ProviderActions'
 import { ProvidersTableSkeleton } from './ProvidersTableSkeleton'
+import { ServiceCategoryName } from '@/components/admin/ServiceCategoryName'
+import { AreaName } from '@/components/admin/AreaName'
 import { formatDistanceToNow } from 'date-fns'
 import { Star } from 'lucide-react'
 
@@ -82,10 +84,8 @@ export function ProvidersTable({
                 </td>
                 <td className="p-2 align-middle whitespace-nowrap">
                   <div className="flex flex-wrap gap-1 max-w-[150px]">
-                    {provider.serviceCategories.slice(0, 2).map((category, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs">
-                        {category}
-                      </Badge>
+                    {provider.serviceCategories.slice(0, 2).map((categoryId, idx) => (
+                      <ServiceCategoryName key={idx} serviceId={categoryId} />
                     ))}
                     {provider.serviceCategories.length > 2 && (
                       <Badge variant="outline" className="text-xs">
@@ -93,8 +93,17 @@ export function ProvidersTable({
                       </Badge>
                     )}
                   </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {provider.serviceArea.length} area{provider.serviceArea.length > 1 ? 's' : ''}
+                  <div className="mt-1">
+                    {provider.serviceArea.slice(0, 2).map((areaId, idx) => (
+                      <div key={idx}>
+                        <AreaName areaId={areaId} />
+                      </div>
+                    ))}
+                    {provider.serviceArea.length > 2 && (
+                      <span className="text-xs text-muted-foreground">
+                        +{provider.serviceArea.length - 2} more
+                      </span>
+                    )}
                   </div>
                 </td>
                 <td className="p-2 align-middle whitespace-nowrap">
