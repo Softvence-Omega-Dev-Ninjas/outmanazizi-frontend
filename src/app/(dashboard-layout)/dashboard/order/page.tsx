@@ -85,8 +85,8 @@ export default function OrderPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Order ID</TableHead>
-              <TableHead>Service Provider ID</TableHead>
-              <TableHead>Consumer ID</TableHead>
+              <TableHead>Service Provider</TableHead>
+              <TableHead>Consumer</TableHead>
               {/* <TableHead>Payment Intent ID</TableHead> */}
               <TableHead>Bid ID</TableHead>
               <TableHead>Status</TableHead>
@@ -160,6 +160,7 @@ export default function OrderPage() {
                       <Button
                         variant="ghost"
                         size="sm"
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/20 border border-blue-200 rounded-full"
                         onClick={() => {
                           setSelectedOrderId(order.id);
                           setShowDetailsDialog(true);
@@ -171,6 +172,7 @@ export default function OrderPage() {
                       <Button
                         variant="ghost"
                         size="sm"
+                        className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-950/20 border border-orange-200 rounded-full"
                         onClick={() => {
                           setSelectedOrderId(order.id);
                           setShowRefundDialog(true);
@@ -182,6 +184,7 @@ export default function OrderPage() {
                       <Button
                         variant="ghost"
                         size="sm"
+                        className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950/20 border border-green-200 rounded-full"
                         onClick={() => {
                           setSelectedOrderId(order.id);
                           setShowTransferDialog(true);

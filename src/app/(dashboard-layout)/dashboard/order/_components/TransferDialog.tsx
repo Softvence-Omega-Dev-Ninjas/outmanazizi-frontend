@@ -17,6 +17,7 @@ import { useOrderDetails } from "@/hooks/useOrders";
 import { useTransfer } from "@/hooks/useStripe";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DollarSign, User, ArrowRightLeft } from "lucide-react";
+import { usePlatformFee } from "@/hooks/usePlatformFee";
 
 interface TransferDialogProps {
   orderId: string | null;
@@ -31,9 +32,17 @@ export function TransferDialog({
 }: TransferDialogProps) {
   const { data: order, isLoading } = useOrderDetails(orderId);
   const transferMutation = useTransfer();
+  const { platformFee } = usePlatformFee();
 
-  const [platformFeePercent, setPlatformFeePercent] = useState("15");
+  const [platformFeePercent, setPlatformFeePercent] = useState("");
   const [confirmed, setConfirmed] = useState(false);
+
+  // Set default platform fee when it loads
+  useEffect(() => {
+    if (platformFee?.amount && !platformFeePercent) {
+      setPlatformFeePercent(platformFee.amount.toString());
+    }
+  }, [platformFee, platformFeePercent]);
 
   // Calculate transfer amount
   const calculateTransfer = () => {
@@ -82,37 +91,39 @@ export function TransferDialog({
     alert(
       `Transfer Amount: $${transfer.transferAmount.toFixed(2)}\n` +
         `Amount in Cents: ${transfer.amountCents}\n` +
-        `Platform Fee: ${platformFeePercent}% ($${transfer.platformFee.toFixed(2)})\n` +
+        `Platform Fee: ${platformFeePercent}% ($${transfer.platformFee.toFixed(
+          2
+        )})\n` +
         `Service Provider: ${order?.bid.serviceProvider.user.name}\n` +
         `Order ID: ${orderId}\n\n` +
         `Check console for full details`
     );
 
     // Uncomment below to actually hit API
-    // transferMutation.mutate(
-    //   { orderId, amountCents: transfer.amountCents },
-    //   {
-    //     onSuccess: () => {
-    //       onOpenChange(false);
-    //       setPlatformFeePercent("15");
-    //       setConfirmed(false);
-    //     },
-    //   }
-    // );
+    transferMutation.mutate(
+      { orderId, amountCents: transfer.amountCents },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          setPlatformFeePercent("15");
+          setConfirmed(false);
+        },
+      }
+    );
 
     // Close dialog after debug
     onOpenChange(false);
-    setPlatformFeePercent("15");
+    setPlatformFeePercent(platformFee?.amount?.toString() || "15");
     setConfirmed(false);
   };
 
   // Reset when dialog closes
   useEffect(() => {
     if (!open) {
-      setPlatformFeePercent("15");
+      setPlatformFeePercent(platformFee?.amount?.toString() || "15");
       setConfirmed(false);
     }
-  }, [open]);
+  }, [open, platformFee]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -252,7 +263,12 @@ export function TransferDialog({
           </Button>
           <Button
             onClick={handleConfirm}
-            disabled={transferMutation.isPending || !order || !confirmed || transfer.transferAmount <= 0}
+            disabled={
+              transferMutation.isPending ||
+              !order ||
+              !confirmed ||
+              transfer.transferAmount <= 0
+            }
             className="bg-green-600 hover:bg-green-700"
           >
             <ArrowRightLeft className="mr-2 size-4" />

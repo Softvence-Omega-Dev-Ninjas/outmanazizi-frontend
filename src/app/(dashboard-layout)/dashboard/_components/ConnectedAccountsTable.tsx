@@ -56,7 +56,7 @@ export function ConnectedAccountsTable({ accounts, isLoading }: ConnectedAccount
                 accounts.map((account) => (
                   <TableRow key={account.id}>
                     <TableCell className="font-mono text-xs">{account.id}</TableCell>
-                    <TableCell className="font-mono text-xs">{account.userId.slice(0, 8)}...</TableCell>
+                    <TableCell className="font-mono text-xs">{account.userId?.slice(0, 8) || 'N/A'}...</TableCell>
                   </TableRow>
                 ))
               )}

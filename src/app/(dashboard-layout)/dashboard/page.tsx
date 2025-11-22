@@ -8,15 +8,23 @@ import { ConnectedAccountsTable } from "./_components/ConnectedAccountsTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Mail } from "lucide-react";
+import { PlatformFeeDisplay } from "@/components/shared/dashboard/PlatformFeeDisplay";
 
 export default function DashboardPage() {
   const { data, isLoading } = useStripeInfo();
 
+  console.log("Stripe Data :", data);
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground">Stripe account overview and analytics</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <p className="text-muted-foreground">
+            Stripe account overview and analytics
+          </p>
+        </div>
+        <PlatformFeeDisplay />
       </div>
 
       {/* Account Info and Balance Cards */}
@@ -40,7 +48,9 @@ export default function DashboardPage() {
               <div className="space-y-2">
                 <div>
                   <p className="text-xs text-muted-foreground">Account ID</p>
-                  <p className="font-mono text-xs truncate">{data?.account?.id}</p>
+                  <p className="font-mono text-xs truncate">
+                    {data?.account?.id}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Email</p>

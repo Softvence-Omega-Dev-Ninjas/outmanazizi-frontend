@@ -17,6 +17,7 @@ import { useOrderDetails } from "@/hooks/useOrders";
 import { useRefund } from "@/hooks/useStripe";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DollarSign, Clock, AlertCircle } from "lucide-react";
+import { usePlatformFee } from "@/hooks/usePlatformFee";
 
 interface RefundDialogProps {
   orderId: string | null;
@@ -31,6 +32,7 @@ export function RefundDialog({
 }: RefundDialogProps) {
   const { data: order, isLoading } = useOrderDetails(orderId);
   const refundMutation = useRefund();
+  const { platformFee } = usePlatformFee();
 
   const [manualMode, setManualMode] = useState(false);
   const [percentage, setPercentage] = useState("");
@@ -40,10 +42,18 @@ export function RefundDialog({
   // Calculate automatic refund based on time
   const calculateAutoRefund = () => {
     if (!order)
-      return { refundAmount: 0, serviceFeeDeducted: 0, percentage: 0, rule: "", totalPaid: 0, bidAmount: 0 };
+      return {
+        refundAmount: 0,
+        serviceFeeDeducted: 0,
+        percentage: 0,
+        rule: "",
+        totalPaid: 0,
+        bidAmount: 0,
+      };
 
     const bidAmount = parseFloat(order.bid.price);
-    const serviceFee = bidAmount * 0.15;
+    const feePercent = platformFee?.amount || 15;
+    const serviceFee = bidAmount * (feePercent / 100);
     const totalPaid = bidAmount + serviceFee;
 
     const startTime = new Date(order.bid.service.startTime);
@@ -136,18 +146,18 @@ export function RefundDialog({
     );
 
     // Uncomment below to actually hit API
-    // refundMutation.mutate(
-    //   { orderId, amount: finalRefundAmount.toFixed(2) },
-    //   {
-    //     onSuccess: () => {
-    //       onOpenChange(false);
-    //       setManualMode(false);
-    //       setPercentage("");
-    //       setFixedAmount("");
-    //       setDeductionAmount("");
-    //     },
-    //   }
-    // );
+    refundMutation.mutate(
+      { orderId, amount: finalRefundAmount.toFixed(2) },
+      {
+        onSuccess: () => {
+          onOpenChange(false);
+          setManualMode(false);
+          setPercentage("");
+          setFixedAmount("");
+          setDeductionAmount("");
+        },
+      }
+    );
 
     // Close dialog after debug
     onOpenChange(false);
@@ -194,10 +204,14 @@ export function RefundDialog({
                 </div>
                 <div>
                   <span className="text-muted-foreground">
-                    Service Fee (15%):
+                    Service Fee ({platformFee?.amount || 15}%):
                   </span>
                   <span className="ml-2 font-medium">
-                    ${(parseFloat(order.bid.price) * 0.15).toFixed(2)}
+                    $
+                    {(
+                      parseFloat(order.bid.price) *
+                      ((platformFee?.amount || 15) / 100)
+                    ).toFixed(2)}
                   </span>
                 </div>
                 <div>
@@ -234,23 +248,21 @@ export function RefundDialog({
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <span className="text-muted-foreground">
-                      Bid Refund %:
-                    </span>
+                    <span className="text-muted-foreground">Bid Refund %:</span>
                     <span className="ml-2 font-medium">
                       {autoRefund.percentage}%
                     </span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">
-                      Bid Refund:
-                    </span>
+                    <span className="text-muted-foreground">Bid Refund:</span>
                     <span className="ml-2 font-medium text-blue-600">
                       ${autoRefund.refundAmount.toFixed(2)}
                     </span>
                   </div>
                   <div className="col-span-2">
-                    <span className="text-muted-foreground">Service Fee (Always Deducted):</span>
+                    <span className="text-muted-foreground">
+                      Service Fee (Always Deducted):
+                    </span>
                     <span className="ml-2 font-medium text-orange-600">
                       ${autoRefund.serviceFeeDeducted.toFixed(2)}
                     </span>
@@ -332,16 +344,26 @@ export function RefundDialog({
             {/* Final Amount */}
             <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Bid Refund Amount:</span>
-                <span className="font-medium">${finalRefundAmount.toFixed(2)}</span>
+                <span className="text-muted-foreground">
+                  Bid Refund Amount:
+                </span>
+                <span className="font-medium">
+                  ${finalRefundAmount.toFixed(2)}
+                </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Service Fee Deducted:</span>
-                <span className="font-medium text-orange-600">-${autoRefund.serviceFeeDeducted.toFixed(2)}</span>
+                <span className="text-muted-foreground">
+                  Service Fee Deducted:
+                </span>
+                <span className="font-medium text-orange-600">
+                  -${autoRefund.serviceFeeDeducted.toFixed(2)}
+                </span>
               </div>
               <Separator />
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-lg">Total Refund to Customer:</span>
+                <span className="font-semibold text-lg">
+                  Total Refund to Customer:
+                </span>
                 <span className="font-bold text-2xl text-green-600">
                   ${finalRefundAmount.toFixed(2)}
                 </span>
@@ -360,7 +382,9 @@ export function RefundDialog({
           </Button>
           <Button
             onClick={handleConfirm}
-            disabled={refundMutation.isPending || !order || finalRefundAmount <= 0}
+            disabled={
+              refundMutation.isPending || !order || finalRefundAmount <= 0
+            }
           >
             {refundMutation.isPending ? "Processing..." : "Confirm Refund"}
           </Button>
