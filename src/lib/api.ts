@@ -1,8 +1,5 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:8080/api" ||
-  "http://72.60.186.49:3000/api";
-
+const API_BASE_URL = "https://api.m3alem.group"
+  
 export const api = {
   get: async (endpoint: string, token?: string) => {
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
