@@ -13,22 +13,28 @@ interface UsersFiltersProps {
   statusFilter: string[]
   verifiedFilter: string[]
   providerFilter: string[]
+  roleFilter: string[]
   onStatusChange: (status: string[]) => void
   onVerifiedChange: (verified: string[]) => void
   onProviderChange: (provider: string[]) => void
+  onRoleChange: (role: string[]) => void
   onReset: () => void
+  isDevelopmentMode: boolean
 }
 
 export function UsersFilters({
   statusFilter,
   verifiedFilter,
   providerFilter,
+  roleFilter,
   onStatusChange,
   onVerifiedChange,
   onProviderChange,
+  onRoleChange,
   onReset,
+  isDevelopmentMode,
 }: UsersFiltersProps) {
-  const hasFilters = statusFilter.length > 0 || verifiedFilter.length > 0 || providerFilter.length > 0
+  const hasFilters = statusFilter.length > 0 || verifiedFilter.length > 0 || providerFilter.length > 0 || roleFilter.length > 0
 
   return (
     <div className="flex items-center gap-2">
@@ -118,13 +124,14 @@ export function UsersFilters({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="sm">
-            <Filter className="mr-2 size-4" />
-            Provider
-          </Button>
-        </DropdownMenuTrigger>
+      {isDevelopmentMode && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Filter className="mr-2 size-4" />
+              Provider
+            </Button>
+          </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
           <DropdownMenuLabel>Filter by Auth Provider</DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -165,7 +172,59 @@ export function UsersFilters({
             Email/Password
           </DropdownMenuCheckboxItem>
         </DropdownMenuContent>
-      </DropdownMenu>
+        </DropdownMenu>
+      )}
+
+      {isDevelopmentMode && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Filter className="mr-2 size-4" />
+              Role
+            </Button>
+          </DropdownMenuTrigger>
+        <DropdownMenuContent align="start">
+          <DropdownMenuLabel>Filter by Role</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuCheckboxItem
+            checked={roleFilter.includes('CONSUMER')}
+            onCheckedChange={(checked) => {
+              onRoleChange(
+                checked
+                  ? [...roleFilter, 'CONSUMER']
+                  : roleFilter.filter((r) => r !== 'CONSUMER')
+              )
+            }}
+          >
+            Consumer
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={roleFilter.includes('SERVICE_PROVIDER')}
+            onCheckedChange={(checked) => {
+              onRoleChange(
+                checked
+                  ? [...roleFilter, 'SERVICE_PROVIDER']
+                  : roleFilter.filter((r) => r !== 'SERVICE_PROVIDER')
+              )
+            }}
+          >
+            Service Provider
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={roleFilter.includes('ADMIN')}
+            onCheckedChange={(checked) => {
+              onRoleChange(
+                checked
+                  ? [...roleFilter, 'ADMIN']
+                  : roleFilter.filter((r) => r !== 'ADMIN')
+              )
+            }}
+          >
+            Admin
+          </DropdownMenuCheckboxItem>
+        </DropdownMenuContent>
+        </DropdownMenu>
+      )}
 
       {hasFilters && (
         <Button variant="ghost" size="sm" onClick={onReset}>

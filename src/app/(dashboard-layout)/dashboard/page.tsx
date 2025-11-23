@@ -4,6 +4,7 @@ import { useStripeInfo } from "@/hooks/useStripe";
 import { BalanceCards } from "./_components/BalanceCards";
 import { RecentPayments } from "./_components/RecentPayments";
 import { RecentTransfersTable } from "./_components/RecentTransfersTable";
+import { RecentRefundsTable } from "./_components/RecentRefundsTable";
 import { ConnectedAccountsTable } from "./_components/ConnectedAccountsTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -68,20 +69,27 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Recent Payments */}
-      <RecentPayments
-        payments={data?.recentPaymentsIntents || []}
-        isLoading={isLoading}
-      />
-
-      {/* Recent Transfers and Connected Accounts */}
+      {/* Recent Transfers, Refunds and Connected Accounts */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <RecentTransfersTable
-          transfers={data?.recentTransfers || []}
-          isLoading={isLoading}
-        />
+        {/* Connected Accounts */}
         <ConnectedAccountsTable
           accounts={data?.accountsList || []}
+          isLoading={isLoading}
+        />
+        {/* Recent Payments */}
+        <RecentPayments
+          payments={data?.recentPaymentsIntents || []}
+          isLoading={isLoading}
+        />
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <RecentRefundsTable
+          refunds={data?.refundList || []}
+          isLoading={isLoading}
+        />
+        <RecentTransfersTable
+          transfers={data?.recentTransfers || []}
           isLoading={isLoading}
         />
       </div>

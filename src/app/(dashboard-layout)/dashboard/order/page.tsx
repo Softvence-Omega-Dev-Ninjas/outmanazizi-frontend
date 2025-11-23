@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Order } from "@/types/order";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye, DollarSign, ArrowRightLeft } from "lucide-react";
+import { Eye, DollarSign, ArrowRightLeft, Search, Filter, ArrowUpDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Pagination } from "../users/_components/Pagination";
 import { useOrders } from "@/hooks/useOrders";
 import { format } from "date-fns";
 import { UserCell } from "./_components/UserCell";
@@ -22,19 +31,60 @@ import { RefundDialog } from "./_components/RefundDialog";
 import { TransferDialog } from "./_components/TransferDialog";
 import { Button } from "@/components/ui/button";
 
+const ITEMS_PER_PAGE = 10;
+
 export default function OrderPage() {
   const { data: orders = [], isLoading } = useOrders();
   const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string[]>([]);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showRefundDialog, setShowRefundDialog] = useState(false);
   const [showTransferDialog, setShowTransferDialog] = useState(false);
 
-  const filteredOrders = orders.filter(
-    (order: Order) =>
-      order.id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.status?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredOrders = useMemo(() => {
+    let filtered = orders;
+
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (order: Order) =>
+          order.id?.toLowerCase().includes(query) ||
+          order.status?.toLowerCase().includes(query) ||
+          order.bidId?.toLowerCase().includes(query)
+      );
+    }
+
+    // Status filter
+    if (statusFilter.length > 0) {
+      filtered = filtered.filter((order: Order) =>
+        statusFilter.includes(order.status)
+      );
+    }
+
+    // Sort by date
+    filtered = filtered.sort((a: Order, b: Order) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+    });
+
+    return filtered;
+  }, [orders, searchQuery, statusFilter, sortOrder]);
+
+  const paginatedOrders = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredOrders.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredOrders, currentPage]);
+
+  const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter, sortOrder]);
 
   console.log("Oders Data :", orders);
 
@@ -66,19 +116,100 @@ export default function OrderPage() {
       <div>
         <h1 className="text-3xl font-bold">Orders</h1>
         <p className="text-muted-foreground">
-          Manage all service orders ({orders.length} total)
+          Manage all service orders ({filteredOrders.length} of {orders.length} total)
         </p>
       </div>
 
-      {/* <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-        <Input
-          placeholder="Search by order ID or status..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9"
-        />
-      </div> */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <Input
+            placeholder="Search by order ID, bid ID or status..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Filter className="mr-2 size-4" />
+                Status {statusFilter.length > 0 && `(${statusFilter.length})`}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuLabel>Filter by Status</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuCheckboxItem
+                checked={statusFilter.includes("PENDING")}
+                onCheckedChange={(checked) => {
+                  setStatusFilter(
+                    checked
+                      ? [...statusFilter, "PENDING"]
+                      : statusFilter.filter((s) => s !== "PENDING")
+                  );
+                }}
+              >
+                Pending
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={statusFilter.includes("IN_PROGRESS")}
+                onCheckedChange={(checked) => {
+                  setStatusFilter(
+                    checked
+                      ? [...statusFilter, "IN_PROGRESS"]
+                      : statusFilter.filter((s) => s !== "IN_PROGRESS")
+                  );
+                }}
+              >
+                In Progress
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={statusFilter.includes("COMPLETED")}
+                onCheckedChange={(checked) => {
+                  setStatusFilter(
+                    checked
+                      ? [...statusFilter, "COMPLETED"]
+                      : statusFilter.filter((s) => s !== "COMPLETED")
+                  );
+                }}
+              >
+                Completed
+              </DropdownMenuCheckboxItem>
+              <DropdownMenuCheckboxItem
+                checked={statusFilter.includes("CANCELLED")}
+                onCheckedChange={(checked) => {
+                  setStatusFilter(
+                    checked
+                      ? [...statusFilter, "CANCELLED"]
+                      : statusFilter.filter((s) => s !== "CANCELLED")
+                  );
+                }}
+              >
+                Cancelled
+              </DropdownMenuCheckboxItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
+          >
+            <ArrowUpDown className="mr-2 size-4" />
+            {sortOrder === "desc" ? "Latest" : "Oldest"}
+          </Button>
+          {statusFilter.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setStatusFilter([])}
+            >
+              Reset
+            </Button>
+          )}
+        </div>
+      </div>
 
       <div className="border rounded-lg">
         <Table>
@@ -134,7 +265,7 @@ export default function OrderPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredOrders.map((order: Order) => (
+              paginatedOrders.map((order: Order) => (
                 <TableRow key={order.id}>
                   <TableCell className="font-mono text-xs">
                     {order.id.slice(0, 8)}...
@@ -169,30 +300,34 @@ export default function OrderPage() {
                         <Eye className="mr-2 size-4" />
                         View
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-950/20 border border-orange-200 rounded-full"
-                        onClick={() => {
-                          setSelectedOrderId(order.id);
-                          setShowRefundDialog(true);
-                        }}
-                      >
-                        <DollarSign className="mr-2 size-4" />
-                        Refund
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950/20 border border-green-200 rounded-full"
-                        onClick={() => {
-                          setSelectedOrderId(order.id);
-                          setShowTransferDialog(true);
-                        }}
-                      >
-                        <ArrowRightLeft className="mr-2 size-4" />
-                        Transfer
-                      </Button>
+                      {order.status === "IN_PROGRESS" && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-950/20 border border-orange-200 rounded-full"
+                            onClick={() => {
+                              setSelectedOrderId(order.id);
+                              setShowRefundDialog(true);
+                            }}
+                          >
+                            <DollarSign className="mr-2 size-4" />
+                            Refund
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950/20 border border-green-200 rounded-full"
+                            onClick={() => {
+                              setSelectedOrderId(order.id);
+                              setShowTransferDialog(true);
+                            }}
+                          >
+                            <ArrowRightLeft className="mr-2 size-4" />
+                            Transfer
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -219,6 +354,16 @@ export default function OrderPage() {
         open={showTransferDialog}
         onOpenChange={setShowTransferDialog}
       />
+
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={filteredOrders.length}
+          itemsPerPage={ITEMS_PER_PAGE}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </div>
   );
 }

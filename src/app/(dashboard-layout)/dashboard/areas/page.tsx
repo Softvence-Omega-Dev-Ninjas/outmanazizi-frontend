@@ -7,7 +7,7 @@ import { CreateAreaDialog } from "./_components/CreateAreaDialog";
 import { UpdateAreaDialog } from "./_components/UpdateAreaDialog";
 import { DeleteAreaDialog } from "./_components/DeleteAreaDialog";
 import { AreasSkeleton } from "./_components/AreasSkeleton";
-import { Search, Plus, Pencil, Trash2, MapPin, Calendar } from "lucide-react";
+import { Search, Plus, Pencil, Trash2, MapPin, Calendar, ArrowUpDown } from "lucide-react";
 import {
   useAreas,
   useCreateArea,
@@ -22,14 +22,21 @@ export default function AreasPage() {
   const updateAreaMutation = useUpdateArea();
   const deleteAreaMutation = useDeleteArea();
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedArea, setSelectedArea] = useState<Area | null>(null);
 
-  const filteredAreas = areas.filter((area: Area) =>
-    area?.area?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredAreas = areas
+    .filter((area: Area) =>
+      area?.area?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a: Area, b: Area) => {
+      const dateA = new Date(a.updatedAt).getTime();
+      const dateB = new Date(b.updatedAt).getTime();
+      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+    });
 
   return (
     <div className="space-y-6">
@@ -46,15 +53,26 @@ export default function AreasPage() {
         </Button>
       </div>
 
-      {/* <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-        <Input
-          placeholder="Search areas..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9"
-        />
-      </div> */}
+      <div className="flex gap-4 items-center">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+          <Input
+            placeholder="Search areas..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
+          className="flex items-center gap-2"
+        >
+          <ArrowUpDown className="size-4" />
+          {sortOrder === "desc" ? "Latest First" : "Oldest First"}
+        </Button>
+      </div>
 
       {isLoading ? (
         <AreasSkeleton />
