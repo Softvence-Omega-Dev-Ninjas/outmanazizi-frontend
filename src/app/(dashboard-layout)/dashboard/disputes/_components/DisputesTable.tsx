@@ -2,6 +2,7 @@
 
 import { Dispute } from "@/types/dispute";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { DisputeActions } from "./DisputeActions";
 import { formatDistanceToNow } from "date-fns";
 import { CheckCircle, Clock, AlertTriangle } from "lucide-react";
@@ -23,10 +24,61 @@ export function DisputesTable({
 }: DisputesTableProps) {
   if (loading) {
     return (
-      <div className="rounded-lg border">
-        <div className="p-8 text-center">
-          <p className="text-muted-foreground">Loading disputes...</p>
-        </div>
+      <div className="w-full overflow-x-auto rounded-lg border">
+        <table className="min-w-full text-sm">
+          <thead className="bg-muted/50">
+            <tr className="border-b">
+              <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap">
+                Dispute ID
+              </th>
+              <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap">
+                Service ID
+              </th>
+              <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap">
+                Details
+              </th>
+              <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap">
+                Status
+              </th>
+              <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap">
+                Evidence
+              </th>
+              <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap">
+                Created
+              </th>
+              <th className="h-10 px-2 text-right align-middle font-medium whitespace-nowrap">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.from({ length: 5 }).map((_, idx) => (
+              <tr key={idx} className="border-b">
+                <td className="p-2 align-middle">
+                  <Skeleton className="h-4 w-20" />
+                </td>
+                <td className="p-2 align-middle">
+                  <Skeleton className="h-4 w-20" />
+                </td>
+                <td className="p-2 align-middle">
+                  <Skeleton className="h-4 w-48" />
+                </td>
+                <td className="p-2 align-middle">
+                  <Skeleton className="h-5 w-20" />
+                </td>
+                <td className="p-2 align-middle">
+                  <Skeleton className="h-5 w-16" />
+                </td>
+                <td className="p-2 align-middle">
+                  <Skeleton className="h-4 w-24" />
+                </td>
+                <td className="p-2 align-middle text-right">
+                  <Skeleton className="h-8 w-8 ml-auto" />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   }

@@ -9,10 +9,13 @@ interface UsersHeaderProps {
   statusFilter: string[];
   verifiedFilter: string[];
   providerFilter: string[];
+  roleFilter: string[];
   onStatusChange: (status: string[]) => void;
   onVerifiedChange: (verified: string[]) => void;
   onProviderChange: (provider: string[]) => void;
+  onRoleChange: (role: string[]) => void;
   onResetFilters: () => void;
+  isDevelopmentMode: boolean;
 }
 
 export function UsersHeader({
@@ -22,10 +25,13 @@ export function UsersHeader({
   statusFilter,
   verifiedFilter,
   providerFilter,
+  roleFilter,
   onStatusChange,
   onVerifiedChange,
   onProviderChange,
+  onRoleChange,
   onResetFilters,
+  isDevelopmentMode,
 }: UsersHeaderProps) {
   return (
     <div className="space-y-4">
@@ -38,7 +44,7 @@ export function UsersHeader({
         </div>
       </div>
 
-      {/* <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
@@ -52,12 +58,15 @@ export function UsersHeader({
           statusFilter={statusFilter}
           verifiedFilter={verifiedFilter}
           providerFilter={providerFilter}
+          roleFilter={roleFilter}
           onStatusChange={onStatusChange}
           onVerifiedChange={onVerifiedChange}
           onProviderChange={onProviderChange}
+          onRoleChange={onRoleChange}
           onReset={onResetFilters}
+          isDevelopmentMode={isDevelopmentMode}
         />
-      </div> */}
+      </div>
     </div>
   );
 }

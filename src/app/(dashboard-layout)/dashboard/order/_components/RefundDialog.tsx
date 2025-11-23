@@ -17,7 +17,6 @@ import { useOrderDetails } from "@/hooks/useOrders";
 import { useRefund } from "@/hooks/useStripe";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DollarSign, Clock, AlertCircle } from "lucide-react";
-import { usePlatformFee } from "@/hooks/usePlatformFee";
 
 interface RefundDialogProps {
   orderId: string | null;
@@ -32,7 +31,6 @@ export function RefundDialog({
 }: RefundDialogProps) {
   const { data: order, isLoading } = useOrderDetails(orderId);
   const refundMutation = useRefund();
-  const { platformFee } = usePlatformFee();
 
   const [manualMode, setManualMode] = useState(false);
   const [percentage, setPercentage] = useState("");
@@ -51,10 +49,10 @@ export function RefundDialog({
         bidAmount: 0,
       };
 
-    const bidAmount = parseFloat(order.bid.price);
-    const feePercent = platformFee?.amount || 15;
-    const serviceFee = bidAmount * (feePercent / 100);
-    const totalPaid = bidAmount + serviceFee;
+    const totalPaid = parseFloat(order.bid.price);
+    const feePercent = order.applicationFeePersen || 0;
+    const bidAmount = totalPaid / (1 + feePercent / 100);
+    const serviceFee = totalPaid - bidAmount;
 
     const startTime = new Date(order.bid.service.startTime);
     const now = new Date();
@@ -96,7 +94,9 @@ export function RefundDialog({
   const calculateManualRefund = () => {
     if (!order) return 0;
 
-    const bidAmount = parseFloat(order.bid.price);
+    const totalPaid = parseFloat(order.bid.price);
+    const feePercent = order.applicationFeePersen || 0;
+    const bidAmount = totalPaid / (1 + feePercent / 100);
 
     if (percentage) {
       return bidAmount * (parseFloat(percentage) / 100);
@@ -200,24 +200,20 @@ export function RefundDialog({
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
                   <span className="text-muted-foreground">Bid Amount:</span>
-                  <span className="ml-2 font-medium">${order.bid.price}</span>
+                  <span className="ml-2 font-medium">${autoRefund.bidAmount.toFixed(2)}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">
-                    Service Fee ({platformFee?.amount || 15}%):
+                    Service Fee ({order.applicationFeePersen || 0}%):
                   </span>
                   <span className="ml-2 font-medium">
-                    $
-                    {(
-                      parseFloat(order.bid.price) *
-                      ((platformFee?.amount || 15) / 100)
-                    ).toFixed(2)}
+                    ${autoRefund.serviceFeeDeducted.toFixed(2)}
                   </span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Total Paid:</span>
                   <span className="ml-2 font-medium">
-                    ${autoRefund.totalPaid.toFixed(2)}
+                    ${order.bid.price}
                   </span>
                 </div>
                 <div>
