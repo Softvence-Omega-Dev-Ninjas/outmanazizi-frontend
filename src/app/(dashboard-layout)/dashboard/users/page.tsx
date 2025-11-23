@@ -9,6 +9,7 @@ import { RoleChangeDialog } from "@/components/admin/RoleChangeDialog";
 import { useUsers, useBlockUser, useDeleteUser } from "@/hooks/useUsers";
 
 const ITEMS_PER_PAGE = 10;
+const isDevelopmentMode = process.env.NODE_ENV === "development";
 
 export default function UsersPage() {
   const { data: allUsers = [], isLoading } = useUsers();
@@ -21,6 +22,7 @@ export default function UsersPage() {
   const [statusFilter, setStatusFilter] = useState<string[]>([]);
   const [verifiedFilter, setVerifiedFilter] = useState<string[]>([]);
   const [providerFilter, setProviderFilter] = useState<string[]>([]);
+  const [roleFilter, setRoleFilter] = useState<string[]>([]);
   const [selectedUserForRole, setSelectedUserForRole] = useState<User | null>(null);
   const [showRoleDialog, setShowRoleDialog] = useState(false);
 
@@ -29,7 +31,15 @@ export default function UsersPage() {
   }, [allUsers]);
 
   const filteredUsers = useMemo(() => {
-    let filtered = users;
+    let filtered = allUsers;
+
+    // Role filter
+    if (roleFilter.length > 0) {
+      filtered = filtered.filter((user: User) => roleFilter.includes(user.role));
+    } else {
+      // Default: show only CONSUMER if no role filter
+      filtered = filtered.filter((user: User) => user.role === "CONSUMER");
+    }
 
     // Search filter
     if (searchQuery.trim()) {
@@ -80,7 +90,7 @@ export default function UsersPage() {
     }
 
     return filtered;
-  }, [users, searchQuery, statusFilter, verifiedFilter, providerFilter]);
+  }, [allUsers, searchQuery, statusFilter, verifiedFilter, providerFilter, roleFilter]);
 
   const paginatedUsers = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -91,12 +101,13 @@ export default function UsersPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, statusFilter, verifiedFilter, providerFilter]);
+  }, [searchQuery, statusFilter, verifiedFilter, providerFilter, roleFilter]);
 
   const handleResetFilters = () => {
     setStatusFilter([]);
     setVerifiedFilter([]);
     setProviderFilter([]);
+    setRoleFilter([]);
   };
 
   const handleBlock = (userId: string) => {
@@ -119,16 +130,19 @@ export default function UsersPage() {
   return (
     <div className="space-y-6">
       <UsersHeader
-        totalUsers={users.length}
+        totalUsers={filteredUsers.length}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         statusFilter={statusFilter}
         verifiedFilter={verifiedFilter}
         providerFilter={providerFilter}
+        roleFilter={roleFilter}
         onStatusChange={setStatusFilter}
         onVerifiedChange={setVerifiedFilter}
         onProviderChange={setProviderFilter}
+        onRoleChange={setRoleFilter}
         onResetFilters={handleResetFilters}
+        isDevelopmentMode={isDevelopmentMode}
       />
 
       <UsersTable

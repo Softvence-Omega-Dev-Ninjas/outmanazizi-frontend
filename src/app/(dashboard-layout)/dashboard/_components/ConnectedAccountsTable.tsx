@@ -18,7 +18,10 @@ interface ConnectedAccountsTableProps {
   isLoading: boolean;
 }
 
-export function ConnectedAccountsTable({ accounts, isLoading }: ConnectedAccountsTableProps) {
+export function ConnectedAccountsTable({
+  accounts,
+  isLoading,
+}: ConnectedAccountsTableProps) {
   return (
     <Card className="border-violet-200 bg-violet-50/50 dark:bg-violet-950/20 dark:border-violet-800">
       <CardHeader>
@@ -30,38 +33,51 @@ export function ConnectedAccountsTable({ accounts, isLoading }: ConnectedAccount
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="border rounded-lg">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Account ID</TableHead>
-                <TableHead>User ID</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                Array.from({ length: 3 }).map((_, idx) => (
-                  <TableRow key={idx}>
-                    <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                    <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                  </TableRow>
-                ))
-              ) : accounts.length === 0 ? (
+        <div className="max-h-80 overflow-y-auto">
+          <div className="border rounded-lg overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={2} className="text-center py-8 text-muted-foreground">
-                    No connected accounts
-                  </TableCell>
+                  <TableHead>Account ID</TableHead>
+                  <TableHead>User ID</TableHead>
                 </TableRow>
-              ) : (
-                accounts.map((account) => (
-                  <TableRow key={account.id}>
-                    <TableCell className="font-mono text-xs">{account.id}</TableCell>
-                    <TableCell className="font-mono text-xs">{account.userId?.slice(0, 8) || 'N/A'}...</TableCell>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  Array.from({ length: 3 }).map((_, idx) => (
+                    <TableRow key={idx}>
+                      <TableCell>
+                        <Skeleton className="h-4 w-32" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-32" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : accounts.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={2}
+                      className="text-center py-8 text-muted-foreground"
+                    >
+                      No connected accounts
+                    </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  accounts.map((account) => (
+                    <TableRow key={account.id}>
+                      <TableCell className="font-mono text-xs">
+                        {account.id}
+                      </TableCell>
+                      <TableCell className="font-mono text-xs">
+                        {account.userId?.slice(0, 8) || "N/A"}...
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       </CardContent>
     </Card>

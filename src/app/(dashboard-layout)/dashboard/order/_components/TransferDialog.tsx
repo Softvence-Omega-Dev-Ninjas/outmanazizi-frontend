@@ -54,7 +54,10 @@ export function TransferDialog({
         amountCents: 0,
       };
 
-    const bidAmount = parseFloat(order.bid.price);
+    const totalPaid = parseFloat(order.bid.price);
+    const applicationFeePercent = order.applicationFeePersen || 0;
+    const bidAmount = totalPaid / (1 + applicationFeePercent / 100);
+    
     const feePercent = parseFloat(platformFeePercent) || 0;
     const platformFee = bidAmount * (feePercent / 100);
     const transferAmount = bidAmount - platformFee;

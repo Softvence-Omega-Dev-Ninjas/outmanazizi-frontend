@@ -9,7 +9,7 @@ import { EditServiceDialog } from "./_components/EditServiceDialog";
 import { CreateSubServiceDialog } from "./_components/CreateSubServiceDialog";
 import { ServicesSkeleton } from "./_components/ServicesSkeleton";
 
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, ArrowUpDown } from "lucide-react";
 import {
   useServices,
   useCreateService,
@@ -26,6 +26,7 @@ export default function ServicesPage() {
   const deleteSubServiceMutation = useDeleteSubService();
   const createSubServiceMutation = useCreateSubService();
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -33,9 +34,15 @@ export default function ServicesPage() {
 
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
-  const filteredServices = services.filter((service: Service) =>
-    service.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredServices = services
+    .filter((service: Service) =>
+      service.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a: Service, b: Service) => {
+      const dateA = new Date(a.updatedAt).getTime();
+      const dateB = new Date(b.updatedAt).getTime();
+      return sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+    });
 
   return (
     <div className="space-y-6">
@@ -52,14 +59,25 @@ export default function ServicesPage() {
         </Button>
       </div>
 
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-500" />
-        <Input
-          placeholder="Search services..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 border-blue-200 focus:border-blue-400"
-        />
+      <div className="flex gap-4 items-center">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-blue-500" />
+          <Input
+            placeholder="Search services..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 border-blue-200 focus:border-blue-400"
+          />
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setSortOrder(sortOrder === "desc" ? "asc" : "desc")}
+          className="flex items-center gap-2"
+        >
+          <ArrowUpDown className="size-4" />
+          {sortOrder === "desc" ? "Latest First" : "Oldest First"}
+        </Button>
       </div>
 
       {isLoading ? (
