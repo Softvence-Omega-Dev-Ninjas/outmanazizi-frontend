@@ -21,7 +21,10 @@ export const api = {
       },
       body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error("API request failed");
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw errorData;
+    }
     return res.json();
   },
 
