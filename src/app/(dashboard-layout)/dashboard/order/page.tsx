@@ -13,7 +13,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye, DollarSign, ArrowRightLeft, Search, Filter, ArrowUpDown } from "lucide-react";
+import {
+  Eye,
+  DollarSign,
+  ArrowRightLeft,
+  Search,
+  Filter,
+  ArrowUpDown,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -111,12 +118,23 @@ export default function OrderPage() {
     return <Badge className={config.className}>{config.label}</Badge>;
   };
 
+  const getPaymentStatusBadge = (orderStatus: string) => {
+    if (orderStatus === "CANCELLED") {
+      return <Badge className="bg-orange-100 text-orange-800 border-orange-200">Refund</Badge>;
+    }
+    if (orderStatus === "COMPLETED") {
+      return <Badge className="bg-green-100 text-green-800 border-green-200">Transfer</Badge>;
+    }
+    return <Badge className="bg-gray-100 text-gray-800 border-gray-200">Pending</Badge>;
+  };
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Orders</h1>
         <p className="text-muted-foreground">
-          Manage all service orders ({filteredOrders.length} of {orders.length} total)
+          Manage all service orders ({filteredOrders.length} of {orders.length}{" "}
+          total)
         </p>
       </div>
 
@@ -220,7 +238,8 @@ export default function OrderPage() {
               <TableHead>Consumer</TableHead>
               {/* <TableHead>Payment Intent ID</TableHead> */}
               <TableHead>Bid ID</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Order Status</TableHead>
+              <TableHead>Payment Status</TableHead>
               <TableHead>Created At</TableHead>
               <TableHead className="text-center">Actions</TableHead>
             </TableRow>
@@ -283,11 +302,12 @@ export default function OrderPage() {
                     {order.bidId.slice(0, 8)}...
                   </TableCell>
                   <TableCell>{getStatusBadge(order.status)}</TableCell>
+                  <TableCell>{getPaymentStatusBadge(order.status)}</TableCell>
                   <TableCell>
                     {format(new Date(order.createdAt), "MMM dd, yyyy")}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex gap-2 justify-end">
+                  <TableCell className="text-center">
+                    <div className="flex gap-2 justify-center">
                       <Button
                         variant="ghost"
                         size="sm"

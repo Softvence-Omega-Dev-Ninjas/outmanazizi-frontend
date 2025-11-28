@@ -57,7 +57,7 @@ export function TransferDialog({
     const totalPaid = parseFloat(order.bid.price);
     const applicationFeePercent = order.applicationFeePersen || 0;
     const bidAmount = totalPaid / (1 + applicationFeePercent / 100);
-    
+
     const feePercent = parseFloat(platformFeePercent) || 0;
     const platformFee = bidAmount * (feePercent / 100);
     const transferAmount = bidAmount - platformFee;
@@ -90,17 +90,17 @@ export function TransferDialog({
       },
     };
 
-    console.log("🟢 TRANSFER DEBUG:", transferData);
-    alert(
-      `Transfer Amount: $${transfer.transferAmount.toFixed(2)}\n` +
-        `Amount in Cents: ${transfer.amountCents}\n` +
-        `Platform Fee: ${platformFeePercent}% ($${transfer.platformFee.toFixed(
-          2
-        )})\n` +
-        `Service Provider: ${order?.bid.serviceProvider.user.name}\n` +
-        `Order ID: ${orderId}\n\n` +
-        `Check console for full details`
-    );
+    // console.log("🟢 TRANSFER DEBUG:", transferData);
+    // alert(
+    //   `Transfer Amount: $${transfer.transferAmount.toFixed(2)}\n` +
+    //     `Amount in Cents: ${transfer.amountCents}\n` +
+    //     `Platform Fee: ${platformFeePercent}% ($${transfer.platformFee.toFixed(
+    //       2
+    //     )})\n` +
+    //     `Service Provider: ${order?.bid.serviceProvider.user.name}\n` +
+    //     `Order ID: ${orderId}\n\n` +
+    //     `Check console for full details`
+    // );
 
     // Uncomment below to actually hit API
     transferMutation.mutate(
