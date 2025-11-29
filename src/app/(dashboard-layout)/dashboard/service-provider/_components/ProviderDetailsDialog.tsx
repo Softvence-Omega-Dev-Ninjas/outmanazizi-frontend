@@ -13,7 +13,8 @@ import { Separator } from '@/components/ui/separator'
 import { ServiceCategoryName } from '@/components/admin/ServiceCategoryName'
 import { AreaName } from '@/components/admin/AreaName'
 import { format } from 'date-fns'
-import { Mail, Phone, MapPin, Calendar, Shield, CheckCircle, XCircle, Star, Briefcase } from 'lucide-react'
+import { Mail, Phone, MapPin, Calendar, Shield, CheckCircle, XCircle, Star, Briefcase, FileText, ExternalLink } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 interface ProviderDetailsDialogProps {
   provider: ServiceProvider
@@ -86,9 +87,23 @@ export function ProviderDetailsDialog({ provider, open, onOpenChange }: Provider
               <Star className="size-5 text-muted-foreground mt-0.5" />
               <div>
                 <p className="text-sm font-medium">Rating</p>
-                <p className="text-sm text-muted-foreground">
-                  {provider.myCurrentRating?.toFixed(1) || '0.0'} ({provider.ratingGetFromUsers} reviews)
-                </p>
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-0.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star
+                        key={star}
+                        className={`size-4 ${
+                          star <= Math.round(provider.myCurrentRating || 0)
+                            ? 'fill-yellow-400 text-yellow-400'
+                            : 'fill-gray-300 text-gray-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    {provider.myCurrentRating?.toFixed(1) || '0.0'} ({provider.ratingGetFromUsers} reviews)
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -132,6 +147,30 @@ export function ProviderDetailsDialog({ provider, open, onOpenChange }: Provider
                 </div>
               </div>
             </div>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-3">
+            <h4 className="font-medium flex items-center gap-2">
+              <FileText className="size-4" />
+              Submitted Documents
+            </h4>
+            {provider.documents ? (
+              <div className="flex items-center gap-3">
+                <p className="text-sm text-muted-foreground">Document available</p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => window.open(provider.documents, '_blank')}
+                >
+                  <ExternalLink className="mr-2 size-4" />
+                  View
+                </Button>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">No documents submitted</p>
+            )}
           </div>
 
           <Separator />
