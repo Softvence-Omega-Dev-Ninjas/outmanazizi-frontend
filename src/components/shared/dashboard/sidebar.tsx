@@ -53,7 +53,7 @@ const sidebarItems = [
     title: "Areas",
     href: "/dashboard/areas",
     icon: MapPin,
-    roles: ["SUPER_ADMIN"], // Only super admin can manage areas
+    roles: ["ADMIN", "SUPER_ADMIN"], // Only super admin can manage areas
   },
   {
     title: "Orders",
