@@ -24,7 +24,7 @@ export default function LoginForm() {
       const response = await api.post("/auth/login", {
         email,
         password,
-        role: "ADMIN",
+        role: "SUPER_ADMIN",
       });
 
       if (response.success) {
