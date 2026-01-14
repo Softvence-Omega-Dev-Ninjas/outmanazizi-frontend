@@ -43,12 +43,12 @@ const sidebarItems = [
     icon: UserCheck,
     roles: ["ADMIN", "SUPER_ADMIN"],
   },
-  {
-    title: "Services",
-    href: "/dashboard/services",
-    icon: Briefcase,
-    roles: ["ADMIN", "SUPER_ADMIN"],
-  },
+  // {
+  //   title: "Services",
+  //   href: "/dashboard/services",
+  //   icon: Briefcase,
+  //   roles: ["ADMIN", "SUPER_ADMIN"],
+  // },
   {
     title: "Areas",
     href: "/dashboard/areas",
