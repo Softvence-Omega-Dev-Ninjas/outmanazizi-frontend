@@ -1,57 +1,127 @@
-'use client'
+"use client";
 
-import { ServiceProvider } from '@/types/serviceProvider'
+import { useState, useEffect } from "react";
+import { ServiceProvider } from "@/types/serviceProvider";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import { ServiceCategoryName } from '@/components/admin/ServiceCategoryName'
-import { AreaName } from '@/components/admin/AreaName'
-import { format } from 'date-fns'
-import { Mail, Phone, MapPin, Calendar, Shield, CheckCircle, XCircle, Star, Briefcase, FileText, ExternalLink } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { ServiceCategoryName } from "@/components/admin/ServiceCategoryName";
+import { AreaName } from "@/components/admin/AreaName";
+import { format } from "date-fns";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  Shield,
+  CheckCircle,
+  XCircle,
+  Star,
+  Briefcase,
+  FileText,
+  ExternalLink,
+  ShieldCheck,
+  ShieldX,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useVerifyServiceProvider } from "@/hooks/useServiceProviders";
 
 interface ProviderDetailsDialogProps {
-  provider: ServiceProvider
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  provider: ServiceProvider;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function ProviderDetailsDialog({ provider, open, onOpenChange }: ProviderDetailsDialogProps) {
+export function ProviderDetailsDialog({
+  provider,
+  open,
+  onOpenChange,
+}: ProviderDetailsDialogProps) {
+  const [loading, setLoading] = useState(false);
+  const [isVerified, setIsVerified] = useState(provider.isVerifiedFromAdmin);
+  const verifyMutation = useVerifyServiceProvider();
+
+  useEffect(() => {
+    setIsVerified(provider.isVerifiedFromAdmin);
+  }, [provider.isVerifiedFromAdmin]);
+
+  const handleVerify = async (isVerifying: boolean) => {
+    setLoading(true);
+    try {
+      await verifyMutation.mutateAsync({ userId: provider.userId, isVerifying });
+      setIsVerified(!isVerified);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl! max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Service Provider Details</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
-          <div className="flex items-center gap-4">
-            <Avatar className="size-20">
-              <AvatarImage src={provider.user.picture} alt={provider.user.name} />
-              <AvatarFallback className="text-2xl">
-                {provider.user.name.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <h3 className="text-xl font-semibold">{provider.user.name}</h3>
-              <p className="text-sm text-muted-foreground">{provider.user.email}</p>
-              <div className="flex gap-2 mt-2 flex-wrap">
-                <Badge>SERVICE_PROVIDER</Badge>
-                {provider.user.isBlocked && <Badge variant="destructive">Blocked</Badge>}
-                {provider.user.isActive && !provider.user.isBlocked && (
-                  <Badge className="bg-green-500">Active</Badge>
-                )}
-                {provider.isVerifiedFromAdmin ? (
-                  <Badge className="bg-blue-500">Admin Verified</Badge>
-                ) : (
-                  <Badge variant="outline">Not Verified</Badge>
-                )}
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Avatar className="size-20">
+                <AvatarImage
+                  src={provider.user.picture}
+                  alt={provider.user.name}
+                />
+                <AvatarFallback className="text-2xl">
+                  {provider.user.name.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold">{provider.user.name}</h3>
+                <p className="text-sm text-muted-foreground">
+                  {provider.user.email}
+                </p>
+                <div className="flex gap-2 mt-2 flex-wrap">
+                  <Badge>SERVICE_PROVIDER</Badge>
+                  {provider.user.isBlocked && (
+                    <Badge variant="destructive">Blocked</Badge>
+                  )}
+                  {provider.user.isActive && !provider.user.isBlocked && (
+                    <Badge className="bg-green-500">Active</Badge>
+                  )}
+                  {isVerified ? (
+                    <Badge className="bg-blue-500">Admin Verified</Badge>
+                  ) : (
+                    <Badge variant="outline">Not Verified</Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="items-center">
+              <div className="flex gap-2 md:mt-12 ">
+                <Button
+                  onClick={() => handleVerify(true)}
+                  disabled={isVerified || loading}
+                  className="bg-green-600 hover:bg-green-700 disabled:cursor-not-allowed cursor-pointer flex-1 sm:flex-none"
+                  size="sm"
+                >
+                  <ShieldCheck className="mr-2 size-4" />
+                  {loading ? "Processing..." : "Verify"}
+                </Button>
+                <Button
+                  onClick={() => handleVerify(false)}
+                  disabled={!isVerified || loading}
+                  variant="destructive"
+                  className="disabled:cursor-not-allowed cursor-pointer flex-1 sm:flex-none"
+                  size="sm"
+                >
+                  <ShieldX className="mr-2 size-4" />
+                  {loading ? "Processing..." : "Reject"}
+                </Button>
               </div>
             </div>
           </div>
@@ -63,7 +133,9 @@ export function ProviderDetailsDialog({ provider, open, onOpenChange }: Provider
               <Mail className="size-5 text-muted-foreground mt-0.5" />
               <div>
                 <p className="text-sm font-medium">Email</p>
-                <p className="text-sm text-muted-foreground">{provider.user.email}</p>
+                <p className="text-sm text-muted-foreground">
+                  {provider.user.email}
+                </p>
               </div>
             </div>
 
@@ -71,7 +143,9 @@ export function ProviderDetailsDialog({ provider, open, onOpenChange }: Provider
               <Phone className="size-5 text-muted-foreground mt-0.5" />
               <div>
                 <p className="text-sm font-medium">Phone</p>
-                <p className="text-sm text-muted-foreground">{provider.user.phone}</p>
+                <p className="text-sm text-muted-foreground">
+                  {provider.user.phone}
+                </p>
               </div>
             </div>
 
@@ -79,7 +153,9 @@ export function ProviderDetailsDialog({ provider, open, onOpenChange }: Provider
               <MapPin className="size-5 text-muted-foreground mt-0.5" />
               <div>
                 <p className="text-sm font-medium">Address</p>
-                <p className="text-sm text-muted-foreground">{provider.address}</p>
+                <p className="text-sm text-muted-foreground">
+                  {provider.address}
+                </p>
               </div>
             </div>
 
@@ -94,14 +170,15 @@ export function ProviderDetailsDialog({ provider, open, onOpenChange }: Provider
                         key={star}
                         className={`size-4 ${
                           star <= Math.round(provider.myCurrentRating || 0)
-                            ? 'fill-yellow-400 text-yellow-400'
-                            : 'fill-gray-300 text-gray-300'
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "fill-gray-300 text-gray-300"
                         }`}
                       />
                     ))}
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    {provider.myCurrentRating?.toFixed(1) || '0.0'} ({provider.ratingGetFromUsers} reviews)
+                    {provider.myCurrentRating?.toFixed(1) || "0.0"} (
+                    {provider.ratingGetFromUsers} reviews)
                   </span>
                 </div>
               </div>
@@ -112,7 +189,7 @@ export function ProviderDetailsDialog({ provider, open, onOpenChange }: Provider
               <div>
                 <p className="text-sm font-medium">Joined</p>
                 <p className="text-sm text-muted-foreground">
-                  {format(new Date(provider.createdAt), 'PPP')}
+                  {format(new Date(provider.createdAt), "PPP")}
                 </p>
               </div>
             </div>
@@ -158,18 +235,22 @@ export function ProviderDetailsDialog({ provider, open, onOpenChange }: Provider
             </h4>
             {provider.documents ? (
               <div className="flex items-center gap-3">
-                <p className="text-sm text-muted-foreground">Document available</p>
+                <p className="text-sm text-muted-foreground">
+                  Document available
+                </p>
                 <Button
                   size="sm"
                   variant="outline"
-                  onClick={() => window.open(provider.documents, '_blank')}
+                  onClick={() => window.open(provider.documents, "_blank")}
                 >
                   <ExternalLink className="mr-2 size-4" />
                   View
                 </Button>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">No documents submitted</p>
+              <p className="text-sm text-muted-foreground">
+                No documents submitted
+              </p>
             )}
           </div>
 
@@ -200,10 +281,12 @@ export function ProviderDetailsDialog({ provider, open, onOpenChange }: Provider
                 ) : (
                   <CheckCircle className="size-4 text-green-500" />
                 )}
-                <span className="text-sm">{provider.user.isBlocked ? 'Blocked' : 'Not Blocked'}</span>
+                <span className="text-sm">
+                  {provider.user.isBlocked ? "Blocked" : "Not Blocked"}
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                {provider.isVerifiedFromAdmin ? (
+                {isVerified ? (
                   <CheckCircle className="size-4 text-green-500" />
                 ) : (
                   <XCircle className="size-4 text-muted-foreground" />
@@ -223,5 +306,5 @@ export function ProviderDetailsDialog({ provider, open, onOpenChange }: Provider
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

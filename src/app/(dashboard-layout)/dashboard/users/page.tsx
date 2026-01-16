@@ -6,6 +6,7 @@ import { UsersTable } from "./_components/UsersTable";
 import { UsersHeader } from "./_components/UsersHeader";
 import { Pagination } from "./_components/Pagination";
 import { RoleChangeDialog } from "@/components/admin/RoleChangeDialog";
+import { UserDetailsDialog } from "./_components/UserDetailsDialog";
 import { useUsers, useBlockUser, useDeleteUser } from "@/hooks/useUsers";
 
 const ITEMS_PER_PAGE = 10;
@@ -25,6 +26,8 @@ export default function UsersPage() {
   const [roleFilter, setRoleFilter] = useState<string[]>([]);
   const [selectedUserForRole, setSelectedUserForRole] = useState<User | null>(null);
   const [showRoleDialog, setShowRoleDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
 
   const users = useMemo(() => {
     return allUsers.filter((user: User) => user.role === "CONSUMER");
@@ -127,6 +130,11 @@ export default function UsersPage() {
     setShowRoleDialog(true);
   };
 
+  const handleRowClick = (user: User) => {
+    setSelectedUser(user);
+    setShowDetailsDialog(true);
+  };
+
   return (
     <div className="space-y-6">
       <UsersHeader
@@ -152,6 +160,7 @@ export default function UsersPage() {
         onUnblock={handleUnblock}
         onDelete={handleDelete}
         onRoleChange={handleRoleChange}
+        onRowClick={handleRowClick}
       />
 
       <RoleChangeDialog
@@ -159,6 +168,14 @@ export default function UsersPage() {
         open={showRoleDialog}
         onOpenChange={setShowRoleDialog}
       />
+
+      {selectedUser && (
+        <UserDetailsDialog
+          user={selectedUser}
+          open={showDetailsDialog}
+          onOpenChange={setShowDetailsDialog}
+        />
+      )}
 
       {totalPages > 1 && (
         <Pagination
