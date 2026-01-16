@@ -31,7 +31,8 @@ import {
   ShieldX,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useVerifyServiceProvider } from "@/hooks/useServiceProviders";
+import { Textarea } from "@/components/ui/textarea";
+import { useVerifyServiceProvider, useChangeUserStatus } from "@/hooks/useServiceProviders";
 
 interface ProviderDetailsDialogProps {
   provider: ServiceProvider;
@@ -46,17 +47,59 @@ export function ProviderDetailsDialog({
 }: ProviderDetailsDialogProps) {
   const [loading, setLoading] = useState(false);
   const [isVerified, setIsVerified] = useState(provider.isVerifiedFromAdmin);
+  const [currentStatus, setCurrentStatus] = useState(provider.status);
+  const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
   const verifyMutation = useVerifyServiceProvider();
+  const changeStatusMutation = useChangeUserStatus();
 
   useEffect(() => {
     setIsVerified(provider.isVerifiedFromAdmin);
-  }, [provider.isVerifiedFromAdmin]);
+    setCurrentStatus(provider.status);
+  }, [provider.isVerifiedFromAdmin, provider.status]);
 
   const handleVerify = async (isVerifying: boolean) => {
     setLoading(true);
     try {
       await verifyMutation.mutateAsync({ userId: provider.userId, isVerifying });
       setIsVerified(!isVerified);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApprove = async () => {
+    setLoading(true);
+    try {
+      await changeStatusMutation.mutateAsync({
+        userId: provider.userId,
+        status: "APPROVED",
+        message: "Service provider approved by admin"
+      });
+      setCurrentStatus("APPROVED");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRejectClick = () => {
+    setShowRejectDialog(true);
+  };
+
+  const handleRejectConfirm = async () => {
+    if (!rejectReason.trim()) {
+      return;
+    }
+    setLoading(true);
+    try {
+      await changeStatusMutation.mutateAsync({
+        userId: provider.userId,
+        status: "REJECTED",
+        message: rejectReason
+      });
+      setCurrentStatus("REJECTED");
+      setShowRejectDialog(false);
+      setRejectReason("");
     } finally {
       setLoading(false);
     }
@@ -98,23 +141,30 @@ export function ProviderDetailsDialog({
                   ) : (
                     <Badge variant="outline">Not Verified</Badge>
                   )}
+                  {currentStatus === "APPROVED" ? (
+                    <Badge className="bg-green-600">Approved</Badge>
+                  ) : currentStatus === "PENDING" ? (
+                    <Badge className="bg-yellow-500">Pending</Badge>
+                  ) : currentStatus === "REJECTED" ? (
+                    <Badge variant="destructive">Rejected</Badge>
+                  ) : null}
                 </div>
               </div>
             </div>
             <div className="items-center">
               <div className="flex gap-2 md:mt-12 ">
                 <Button
-                  onClick={() => handleVerify(true)}
-                  disabled={isVerified || loading}
+                  onClick={handleApprove}
+                  disabled={currentStatus === "APPROVED" || loading}
                   className="bg-green-600 hover:bg-green-700 disabled:cursor-not-allowed cursor-pointer flex-1 sm:flex-none"
                   size="sm"
                 >
                   <ShieldCheck className="mr-2 size-4" />
-                  {loading ? "Processing..." : "Verify"}
+                  {loading ? "Processing..." : "Approve"}
                 </Button>
                 <Button
-                  onClick={() => handleVerify(false)}
-                  disabled={!isVerified || loading}
+                  onClick={handleRejectClick}
+                  disabled={currentStatus === "REJECTED" || loading}
                   variant="destructive"
                   className="disabled:cursor-not-allowed cursor-pointer flex-1 sm:flex-none"
                   size="sm"
@@ -301,10 +351,67 @@ export function ProviderDetailsDialog({
                 )}
                 <span className="text-sm">Profile Completed</span>
               </div>
+              <div className="flex items-center gap-2">
+                {currentStatus === "APPROVED" ? (
+                  <CheckCircle className="size-4 text-green-500" />
+                ) : currentStatus === "PENDING" ? (
+                  <XCircle className="size-4 text-yellow-500" />
+                ) : currentStatus === "REJECTED" ? (
+                  <XCircle className="size-4 text-destructive" />
+                ) : (
+                  <XCircle className="size-4 text-muted-foreground" />
+                )}
+                <span className="text-sm">
+                  {currentStatus === "APPROVED"
+                    ? "Approved"
+                    : currentStatus === "PENDING"
+                    ? "Pending Approval"
+                    : currentStatus === "REJECTED"
+                    ? "Rejected"
+                    : "No Status"}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </DialogContent>
+
+      <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Service Provider</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Please provide a reason for rejecting {provider.user.name}
+            </p>
+            <Textarea
+              placeholder="Enter rejection reason..."
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              rows={4}
+            />
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowRejectDialog(false);
+                setRejectReason("");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleRejectConfirm}
+              disabled={!rejectReason.trim() || loading}
+            >
+              {loading ? "Rejecting..." : "Reject"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
