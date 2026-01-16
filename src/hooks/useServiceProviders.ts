@@ -102,3 +102,26 @@ export function useVerifyServiceProvider() {
     },
   })
 }
+
+export function useChangeUserStatus() {
+  const { token } = useAuth()
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ userId, status, message }: { userId: string; status: string; message: string }) => {
+      if (!token) throw new Error('No token')
+      return userService.changeUserStatus(userId, status, message, token)
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['service-providers'] })
+      if (variables.status === 'APPROVED') {
+        toast.success('Service provider approved successfully')
+      } else if (variables.status === 'REJECTED') {
+        toast.success('Service provider rejected successfully')
+      }
+    },
+    onError: () => {
+      toast.error('Failed to change user status')
+    },
+  })
+}

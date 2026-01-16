@@ -24,6 +24,7 @@ export interface ServiceProvider {
   isVerifiedFromAdmin: boolean
   myCurrentRating?: number
   ratingGetFromUsers: number
+  status?: 'PENDING' | 'APPROVED' | 'REJECTED'
   createdAt: string
   updatedAt: string
 }

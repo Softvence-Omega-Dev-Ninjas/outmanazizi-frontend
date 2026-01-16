@@ -21,4 +21,8 @@ export const userService = {
   verifyServiceProvider: async (userId: string, token: string) => {
     return api.patch(`/admin/verify-service-provider/${userId}`, {}, token)
   },
+
+  changeUserStatus: async (userId: string, status: string, message: string, token: string) => {
+    return api.patch(`/admin/change-user-status/${userId}`, { status, message }, token)
+  },
 }
