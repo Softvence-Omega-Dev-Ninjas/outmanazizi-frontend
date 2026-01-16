@@ -9,6 +9,7 @@ import { ServiceCategoryName } from "@/components/admin/ServiceCategoryName";
 import { AreaName } from "@/components/admin/AreaName";
 import { formatDistanceToNow } from "date-fns";
 import { Star } from "lucide-react";
+import { ProviderDetailsDialog } from "./ProviderDetailsDialog";
 
 interface ProvidersTableProps {
   providers: ServiceProvider[];
@@ -19,6 +20,7 @@ interface ProvidersTableProps {
   onUnverify: (providerId: string) => void;
   onDelete: (userId: string) => void;
   onRoleChange: (provider: ServiceProvider) => void;
+  onRowClick: (provider: ServiceProvider) => void;
 }
 
 export function ProvidersTable({
@@ -30,6 +32,7 @@ export function ProvidersTable({
   onUnverify,
   onDelete,
   onRoleChange,
+  onRowClick,
 }: ProvidersTableProps) {
   if (loading) {
     return <ProvidersTableSkeleton />;
@@ -77,7 +80,8 @@ export function ProvidersTable({
           {providers.map((provider) => (
             <tr
               key={provider.id}
-              className="border-b transition-colors hover:bg-muted/50"
+              className="border-b transition-colors hover:bg-muted/50 cursor-pointer"
+              onClick={() => onRowClick(provider)}
             >
               <td className="p-2 align-middle whitespace-nowrap">
                 <div className="flex items-center gap-3">
@@ -176,7 +180,7 @@ export function ProvidersTable({
                   addSuffix: true,
                 })}
               </td>
-              <td className="p-2 align-middle whitespace-nowrap text-right">
+              <td className="p-2 align-middle whitespace-nowrap text-right" onClick={(e) => e.stopPropagation()}>
                 <ProviderActions
                   provider={provider}
                   onBlock={onBlock}

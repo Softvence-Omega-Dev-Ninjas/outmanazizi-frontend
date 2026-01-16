@@ -14,6 +14,7 @@ interface UsersTableProps {
   onUnblock: (userId: string) => void;
   onDelete: (userId: string) => void;
   onRoleChange: (user: User) => void;
+  onRowClick: (user: User) => void;
 }
 
 export function UsersTable({
@@ -23,6 +24,7 @@ export function UsersTable({
   onUnblock,
   onDelete,
   onRoleChange,
+  onRowClick,
 }: UsersTableProps) {
   if (loading) {
     return <UsersTableSkeleton />;
@@ -70,7 +72,8 @@ export function UsersTable({
           {users.map((user) => (
             <tr
               key={user.id}
-              className="border-b transition-colors hover:bg-muted/50"
+              className="border-b transition-colors hover:bg-muted/50 cursor-pointer"
+              onClick={() => onRowClick(user)}
             >
               <td className="p-2 align-middle whitespace-nowrap">
                 <div className="flex items-center gap-3">
@@ -143,7 +146,7 @@ export function UsersTable({
                   addSuffix: true,
                 })}
               </td>
-              <td className="p-2 align-middle whitespace-nowrap text-right">
+              <td className="p-2 align-middle whitespace-nowrap text-right" onClick={(e) => e.stopPropagation()}>
                 <UserActions
                   user={user}
                   onBlock={onBlock}

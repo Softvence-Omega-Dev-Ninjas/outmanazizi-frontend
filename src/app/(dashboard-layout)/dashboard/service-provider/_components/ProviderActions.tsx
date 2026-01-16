@@ -104,7 +104,7 @@ export function ProviderActions({
             <UserCog className="mr-2 size-4" />
             Change Role
           </DropdownMenuItem>
-          {provider.isVerifiedFromAdmin ? (
+          {/* {provider.isVerifiedFromAdmin ? (
             <DropdownMenuItem onClick={handleUnverify} disabled={loading}>
               <ShieldX className="mr-2 size-4" />
               Unverify Provider
@@ -114,7 +114,7 @@ export function ProviderActions({
               <ShieldCheck className="mr-2 size-4" />
               Verify Provider
             </DropdownMenuItem>
-          )}
+          )} */}
           <DropdownMenuSeparator />
           {provider.user.isBlocked ? (
             <DropdownMenuItem onClick={handleUnblock} disabled={loading}>
