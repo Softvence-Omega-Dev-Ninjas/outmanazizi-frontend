@@ -150,7 +150,8 @@ export function ProvidersTable({
                   ))}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {provider.myCurrentRating?.toFixed(1) || "0.0"} ({provider.ratingGetFromUsers} review
+                  {provider.myCurrentRating?.toFixed(1) || "0.0"} (
+                  {provider.ratingGetFromUsers} review
                   {provider.ratingGetFromUsers !== 1 ? "s" : ""})
                 </div>
               </td>
@@ -164,7 +165,7 @@ export function ProvidersTable({
                     <Badge variant="secondary">Inactive</Badge>
                   )}
                   {provider.isVerifiedFromAdmin ? (
-                    <Badge className="bg-blue-500">Verified</Badge>
+                    <Badge className="bg-blue-500">Admin Verified</Badge>
                   ) : (
                     <Badge variant="outline">Not Verified</Badge>
                   )}
@@ -173,6 +174,13 @@ export function ProvidersTable({
                       Incomplete
                     </Badge>
                   )}
+                  {provider.status === "APPROVED" ? (
+                    <Badge className="bg-green-600">Approved</Badge>
+                  ) : provider.status === "PENDING" ? (
+                    <Badge className="bg-yellow-500">Pending</Badge>
+                  ) : provider.status === "REJECTED" ? (
+                    <Badge variant="destructive">Rejected</Badge>
+                  ) : null}
                 </div>
               </td>
               <td className="p-2 align-middle whitespace-nowrap text-sm text-muted-foreground">
@@ -180,7 +188,10 @@ export function ProvidersTable({
                   addSuffix: true,
                 })}
               </td>
-              <td className="p-2 align-middle whitespace-nowrap text-right" onClick={(e) => e.stopPropagation()}>
+              <td
+                className="p-2 align-middle whitespace-nowrap text-right"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <ProviderActions
                   provider={provider}
                   onBlock={onBlock}
