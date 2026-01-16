@@ -6,6 +6,7 @@ import { ProvidersTable } from "./_components/ProvidersTable";
 import { ProvidersHeader } from "./_components/ProvidersHeader";
 import { Pagination } from "../users/_components/Pagination";
 import { RoleChangeDialog } from "@/components/admin/RoleChangeDialog";
+import { ProviderDetailsDialog } from "./_components/ProviderDetailsDialog";
 import {
   useServiceProviders,
   useBlockServiceProvider,
@@ -37,6 +38,8 @@ export default function ServiceProviderPage() {
   const [profileFilter, setProfileFilter] = useState<string[]>([]);
   const [selectedUserForRole, setSelectedUserForRole] = useState<any>(null);
   const [showRoleDialog, setShowRoleDialog] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState<ServiceProvider | null>(null);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
 
   const filteredProviders = useMemo(() => {
     let filtered = providers;
@@ -159,6 +162,11 @@ export default function ServiceProviderPage() {
     setShowRoleDialog(true);
   };
 
+  const handleRowClick = (provider: ServiceProvider) => {
+    setSelectedProvider(provider);
+    setShowDetailsDialog(true);
+  };
+
   return (
     <div className="space-y-6">
       <ProvidersHeader
@@ -183,13 +191,23 @@ export default function ServiceProviderPage() {
         onUnverify={handleUnverify}
         onDelete={handleDelete}
         onRoleChange={handleRoleChange}
+        onRowClick={handleRowClick}
       />
 
       <RoleChangeDialog
         user={selectedUserForRole}
         open={showRoleDialog}
         onOpenChange={setShowRoleDialog}
+        excludeRoles={['CONSUMER']}
       />
+
+      {selectedProvider && (
+        <ProviderDetailsDialog
+          provider={selectedProvider}
+          open={showDetailsDialog}
+          onOpenChange={setShowDetailsDialog}
+        />
+      )}
 
       {totalPages > 1 && (
         <Pagination

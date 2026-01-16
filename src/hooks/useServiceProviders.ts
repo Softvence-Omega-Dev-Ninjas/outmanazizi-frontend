@@ -85,16 +85,20 @@ export function useVerifyServiceProvider() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (userId: string) => {
+    mutationFn: async ({ userId, isVerifying }: { userId: string; isVerifying: boolean }) => {
       if (!token) throw new Error('No token')
-      return userService.verifyServiceProvider(userId, token)
+      return { response: await userService.verifyServiceProvider(userId, token), isVerifying }
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['service-providers'] })
-      toast.success('Service provider verified successfully')
+      if (data.isVerifying) {
+        toast.success('Service provider verified successfully')
+      } else {
+        toast.success('Service provider rejected successfully')
+      }
     },
     onError: () => {
-      toast.error('Failed to verify service provider')
+      toast.error('Failed to update service provider status')
     },
   })
 }

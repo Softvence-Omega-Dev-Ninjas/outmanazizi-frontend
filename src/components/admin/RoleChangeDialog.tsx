@@ -31,6 +31,7 @@ interface RoleChangeDialogProps {
   user: User | null
   open: boolean
   onOpenChange: (open: boolean) => void
+  excludeRoles?: string[]
 }
 
 const ROLES = [
@@ -40,7 +41,7 @@ const ROLES = [
   { value: 'SUPER_ADMIN', label: 'Super Admin', color: 'bg-red-100 text-red-800' },
 ]
 
-export function RoleChangeDialog({ user, open, onOpenChange }: RoleChangeDialogProps) {
+export function RoleChangeDialog({ user, open, onOpenChange, excludeRoles = [] }: RoleChangeDialogProps) {
   const [selectedRole, setSelectedRole] = useState<string>('')
   const changeRoleMutation = useChangeUserRole()
 
@@ -91,7 +92,7 @@ export function RoleChangeDialog({ user, open, onOpenChange }: RoleChangeDialogP
                 <SelectValue placeholder="Select new role" />
               </SelectTrigger>
               <SelectContent>
-                {ROLES.map((role) => (
+                {ROLES.filter(role => !excludeRoles.includes(role.value) || role.value === user.role).map((role) => (
                   <SelectItem 
                     key={role.value} 
                     value={role.value}
