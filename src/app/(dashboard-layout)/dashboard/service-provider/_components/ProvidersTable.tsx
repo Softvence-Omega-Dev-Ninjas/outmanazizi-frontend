@@ -71,9 +71,6 @@ export function ProvidersTable({
             <th className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap min-w-[120px]">
               Joined
             </th>
-            <th className="h-10 px-2 text-right align-middle font-medium whitespace-nowrap min-w-[100px]">
-              Actions
-            </th>
           </tr>
         </thead>
         <tbody className="[&_tr:last-child]:border-0">
@@ -83,8 +80,8 @@ export function ProvidersTable({
               className="border-b transition-colors hover:bg-muted/50 cursor-pointer"
               onClick={() => onRowClick(provider)}
             >
-              <td className="p-2 align-middle whitespace-nowrap">
-                <div className="flex items-center gap-3">
+              <td className="p-2 align-middle whitespace-nowrap max-w-[150px]">
+                <div className="flex items-center gap-3 ">
                   <Avatar className="shrink-0">
                     <AvatarImage
                       src={provider.user.picture}
@@ -111,7 +108,7 @@ export function ProvidersTable({
                 </div>
               </td>
               <td className="p-2 align-middle whitespace-nowrap">
-                <div className="flex flex-wrap gap-1 max-w-[150px]">
+                <div className="flex flex-row gap-1 max-w-[150px]">
                   {provider.serviceCategories
                     .slice(0, 2)
                     .map((categoryId, idx) => (
@@ -123,7 +120,7 @@ export function ProvidersTable({
                     </Badge>
                   )}
                 </div>
-                <div className="mt-1">
+                <div className="mt-1 flex flex-row gap-1">
                   {provider.serviceArea.slice(0, 2).map((areaId, idx) => (
                     <div key={idx}>
                       <AreaName areaId={areaId} />
@@ -156,19 +153,19 @@ export function ProvidersTable({
                 </div>
               </td>
               <td className="p-2 align-middle whitespace-nowrap">
-                <div className="flex flex-col gap-1">
-                  {provider.user.isBlocked ? (
+                <div className="flex flex-row gap-1">
+                  {/* {provider.user.isBlocked ? (
                     <Badge variant="destructive">Blocked</Badge>
                   ) : provider.user.isActive ? (
                     <Badge className="bg-green-500">Active</Badge>
                   ) : (
                     <Badge variant="secondary">Inactive</Badge>
-                  )}
-                  {provider.isVerifiedFromAdmin ? (
+                  )} */}
+                  {/* {provider.isVerifiedFromAdmin ? (
                     <Badge className="bg-blue-500">Admin Verified</Badge>
                   ) : (
                     <Badge variant="outline">Not Verified</Badge>
-                  )}
+                  )} */}
                   {!provider.isProfileCompleted && (
                     <Badge variant="secondary" className="text-xs">
                       Incomplete
@@ -187,20 +184,6 @@ export function ProvidersTable({
                 {formatDistanceToNow(new Date(provider.createdAt), {
                   addSuffix: true,
                 })}
-              </td>
-              <td
-                className="p-2 align-middle whitespace-nowrap text-right"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <ProviderActions
-                  provider={provider}
-                  onBlock={onBlock}
-                  onUnblock={onUnblock}
-                  onVerify={onVerify}
-                  onUnverify={onUnverify}
-                  onDelete={onDelete}
-                  onRoleChange={onRoleChange}
-                />
               </td>
             </tr>
           ))}
