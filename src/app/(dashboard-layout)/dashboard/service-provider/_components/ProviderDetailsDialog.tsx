@@ -29,26 +29,41 @@ import {
   ExternalLink,
   ShieldCheck,
   ShieldX,
+  Ban,
+  Trash2,
+  UserCog,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useVerifyServiceProvider, useChangeUserStatus } from "@/hooks/useServiceProviders";
+import {
+  useVerifyServiceProvider,
+  useChangeUserStatus,
+} from "@/hooks/useServiceProviders";
 
 interface ProviderDetailsDialogProps {
   provider: ServiceProvider;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onBlock: (userId: string) => void;
+  onUnblock: (userId: string) => void;
+  onDelete: (userId: string) => void;
+  onRoleChange: (provider: ServiceProvider) => void;
 }
 
 export function ProviderDetailsDialog({
   provider,
   open,
   onOpenChange,
+  onBlock,
+  onUnblock,
+  onDelete,
+  onRoleChange,
 }: ProviderDetailsDialogProps) {
   const [loading, setLoading] = useState(false);
   const [isVerified, setIsVerified] = useState(provider.isVerifiedFromAdmin);
   const [currentStatus, setCurrentStatus] = useState(provider.status);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const verifyMutation = useVerifyServiceProvider();
   const changeStatusMutation = useChangeUserStatus();
@@ -61,7 +76,10 @@ export function ProviderDetailsDialog({
   const handleVerify = async (isVerifying: boolean) => {
     setLoading(true);
     try {
-      await verifyMutation.mutateAsync({ userId: provider.userId, isVerifying });
+      await verifyMutation.mutateAsync({
+        userId: provider.userId,
+        isVerifying,
+      });
       setIsVerified(!isVerified);
     } finally {
       setLoading(false);
@@ -74,7 +92,7 @@ export function ProviderDetailsDialog({
       await changeStatusMutation.mutateAsync({
         userId: provider.userId,
         status: "APPROVED",
-        message: "Service provider approved by admin"
+        message: "Service provider approved by admin",
       });
       setCurrentStatus("APPROVED");
     } finally {
@@ -95,7 +113,7 @@ export function ProviderDetailsDialog({
       await changeStatusMutation.mutateAsync({
         userId: provider.userId,
         status: "REJECTED",
-        message: rejectReason
+        message: rejectReason,
       });
       setCurrentStatus("REJECTED");
       setShowRejectDialog(false);
@@ -103,6 +121,25 @@ export function ProviderDetailsDialog({
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleBlock = async () => {
+    setLoading(true);
+    await onBlock(provider.userId);
+    setLoading(false);
+  };
+
+  const handleUnblock = async () => {
+    setLoading(true);
+    await onUnblock(provider.userId);
+    setLoading(false);
+  };
+
+  const handleDelete = async () => {
+    setLoading(true);
+    await onDelete(provider.userId);
+    setShowDeleteDialog(false);
+    setLoading(false);
   };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -129,18 +166,18 @@ export function ProviderDetailsDialog({
                   {provider.user.email}
                 </p>
                 <div className="flex gap-2 mt-2 flex-wrap">
-                  <Badge>SERVICE_PROVIDER</Badge>
+                  <Badge>SERVICE PROVIDER</Badge>
                   {provider.user.isBlocked && (
                     <Badge variant="destructive">Blocked</Badge>
                   )}
-                  {provider.user.isActive && !provider.user.isBlocked && (
+                  {/* {provider.user.isActive && !provider.user.isBlocked && (
                     <Badge className="bg-green-500">Active</Badge>
-                  )}
-                  {isVerified ? (
+                  )} */}
+                  {/* {isVerified ? (
                     <Badge className="bg-blue-500">Admin Verified</Badge>
                   ) : (
                     <Badge variant="outline">Not Verified</Badge>
-                  )}
+                  )} */}
                   {currentStatus === "APPROVED" ? (
                     <Badge className="bg-green-600">Approved</Badge>
                   ) : currentStatus === "PENDING" ? (
@@ -151,28 +188,73 @@ export function ProviderDetailsDialog({
                 </div>
               </div>
             </div>
-            <div className="items-center">
-              <div className="flex gap-2 md:mt-12 ">
+          </div>
+
+          <Separator />
+
+          <div className="space-y-3">
+            <h4 className="font-medium">Actions</h4>
+            <div className="grid gap-2 sm:grid-cols-5">
+              <Button
+                onClick={handleApprove}
+                disabled={currentStatus === "APPROVED" || loading}
+                className="bg-green-600 hover:bg-green-700 disabled:cursor-not-allowed cursor-pointer"
+                size="sm"
+              >
+                <ShieldCheck className="mr-2 size-4" />
+                Approve
+              </Button>
+              <Button
+                onClick={handleRejectClick}
+                disabled={currentStatus === "REJECTED" || loading}
+                variant="destructive"
+                className="disabled:cursor-not-allowed cursor-pointer hover:bg-red-700"
+                size="sm"
+              >
+                <ShieldX className="mr-2 size-4" />
+                Reject
+              </Button>
+              <Button
+                onClick={() => onRoleChange(provider)}
+                variant="outline"
+                size="sm"
+                className="cursor-pointer"
+              >
+                <UserCog className="mr-2 size-4" />
+                Change Role
+              </Button>
+              {provider.user.isBlocked ? (
                 <Button
-                  onClick={handleApprove}
-                  disabled={currentStatus === "APPROVED" || loading}
-                  className="bg-green-600 hover:bg-green-700 disabled:cursor-not-allowed cursor-pointer flex-1 sm:flex-none"
+                  onClick={handleUnblock}
+                  disabled={loading}
+                  variant="outline"
                   size="sm"
+                  className="cursor-pointer"
                 >
-                  <ShieldCheck className="mr-2 size-4" />
-                  {loading ? "Processing..." : "Approve"}
+                  <CheckCircle className="mr-2 size-4" />
+                  Unblock User
                 </Button>
+              ) : (
                 <Button
-                  onClick={handleRejectClick}
-                  disabled={currentStatus === "REJECTED" || loading}
-                  variant="destructive"
-                  className="disabled:cursor-not-allowed cursor-pointer flex-1 sm:flex-none"
+                  onClick={handleBlock}
+                  disabled={loading}
+                  variant="outline"
                   size="sm"
+                  className="cursor-pointer"
                 >
-                  <ShieldX className="mr-2 size-4" />
-                  {loading ? "Processing..." : "Reject"}
+                  <Ban className="mr-2 size-4" />
+                  Block User
                 </Button>
-              </div>
+              )}
+              <Button
+                onClick={() => setShowDeleteDialog(true)}
+                variant="destructive"
+                className="sm:col-span-1 cursor-pointer hover:bg-red-700"
+                size="sm"
+              >
+                <Trash2 className=" size-4" />
+                Delete Provider
+              </Button>
             </div>
           </div>
 
@@ -317,14 +399,14 @@ export function ProviderDetailsDialog({
                 )}
                 <span className="text-sm">Email Verified</span>
               </div>
-              <div className="flex items-center gap-2">
+              {/* <div className="flex items-center gap-2">
                 {provider.user.isActive ? (
                   <CheckCircle className="size-4 text-green-500" />
                 ) : (
                   <XCircle className="size-4 text-muted-foreground" />
                 )}
                 <span className="text-sm">Active</span>
-              </div>
+              </div> */}
               <div className="flex items-center gap-2">
                 {provider.user.isBlocked ? (
                   <XCircle className="size-4 text-destructive" />
@@ -335,14 +417,14 @@ export function ProviderDetailsDialog({
                   {provider.user.isBlocked ? "Blocked" : "Not Blocked"}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
+              {/* <div className="flex items-center gap-2">
                 {isVerified ? (
                   <CheckCircle className="size-4 text-green-500" />
                 ) : (
                   <XCircle className="size-4 text-muted-foreground" />
                 )}
                 <span className="text-sm">Admin Verified</span>
-              </div>
+              </div> */}
               <div className="flex items-center gap-2">
                 {provider.isProfileCompleted ? (
                   <CheckCircle className="size-4 text-green-500" />
@@ -365,16 +447,43 @@ export function ProviderDetailsDialog({
                   {currentStatus === "APPROVED"
                     ? "Approved"
                     : currentStatus === "PENDING"
-                    ? "Pending Approval"
-                    : currentStatus === "REJECTED"
-                    ? "Rejected"
-                    : "No Status"}
+                      ? "Pending Approval"
+                      : currentStatus === "REJECTED"
+                        ? "Rejected"
+                        : "No Status"}
                 </span>
               </div>
             </div>
           </div>
         </div>
       </DialogContent>
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Service Provider</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Are you sure you want to delete {provider.user.name}? This action
+            cannot be undone.
+          </p>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={loading}
+            >
+              {loading ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
         <DialogContent>

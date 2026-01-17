@@ -169,6 +169,10 @@ export function ProviderActions({
         provider={provider}
         open={showDetailsDialog}
         onOpenChange={setShowDetailsDialog}
+        onBlock={onBlock}
+        onUnblock={onUnblock}
+        onDelete={onDelete}
+        onRoleChange={onRoleChange}
       />
     </>
   );
