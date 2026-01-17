@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Admin Dashboard",
-  description: "Admin dashboard outmanazizi application",
+  title: "M3alem - Admin Dashboard",
+  description: "Admin dashboard M3alem application",
 };
 
 export default function RootLayout({

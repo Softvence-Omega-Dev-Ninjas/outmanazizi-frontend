@@ -206,6 +206,10 @@ export default function ServiceProviderPage() {
           provider={selectedProvider}
           open={showDetailsDialog}
           onOpenChange={setShowDetailsDialog}
+          onBlock={handleBlock}
+          onUnblock={handleUnblock}
+          onDelete={handleDelete}
+          onRoleChange={handleRoleChange}
         />
       )}
 
