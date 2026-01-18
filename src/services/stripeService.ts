@@ -7,7 +7,7 @@ export const stripeService = {
 
   processRefund: async (
     data: { orderId: string; amount: string },
-    token: string
+    token: string,
   ): Promise<any> => {
     console.log("payment Refund Data", data);
     return api.post("/payments/refund", data, token);
@@ -15,7 +15,7 @@ export const stripeService = {
 
   createTransfer: async (
     data: { orderId: string; amountCents: number },
-    token: string
+    token: string,
   ): Promise<any> => {
     console.log("payment Transfer Data", data);
     return api.post("/payments/create-transfer", data, token);

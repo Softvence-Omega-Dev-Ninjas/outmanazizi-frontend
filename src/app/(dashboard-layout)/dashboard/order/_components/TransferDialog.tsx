@@ -95,11 +95,21 @@ export function TransferDialog({
     //   `Transfer Amount: $${transfer.transferAmount.toFixed(2)}\n` +
     //     `Amount in Cents: ${transfer.amountCents}\n` +
     //     `Platform Fee: ${platformFeePercent}% ($${transfer.platformFee.toFixed(
-    //       2
+    //       2,
     //     )})\n` +
     //     `Service Provider: ${order?.bid.serviceProvider.user.name}\n` +
     //     `Order ID: ${orderId}\n\n` +
-    //     `Check console for full details`
+    //     `Check console for full details`,
+    // );
+    // console.log(
+    //   `Transfer Amount: $${transfer.transferAmount.toFixed(2)}\n` +
+    //     `Amount in Cents: ${transfer.amountCents}\n` +
+    //     `Platform Fee: ${platformFeePercent}% ($${transfer.platformFee.toFixed(
+    //       2,
+    //     )})\n` +
+    //     `Service Provider: ${order?.bid.serviceProvider.user.name}\n` +
+    //     `Order ID: ${orderId}\n\n` +
+    //     `Check console for full details`,
     // );
 
     // Uncomment below to actually hit API
@@ -111,7 +121,7 @@ export function TransferDialog({
           setPlatformFeePercent("15");
           setConfirmed(false);
         },
-      }
+      },
     );
 
     // Close dialog after debug

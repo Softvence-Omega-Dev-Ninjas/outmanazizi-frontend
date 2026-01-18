@@ -137,17 +137,17 @@ export function RefundDialog({
           },
     };
 
-    console.log("🔵 REFUND DEBUG:", refundData);
-    alert(
-      `Refund Amount: $${finalRefundAmount.toFixed(2)}\n` +
-        `Mode: ${refundData.mode}\n` +
-        `Order ID: ${orderId}\n\n` +
-        `Check console for full details`
-    );
+    // console.log("🔵 REFUND DEBUG:", refundData);
+    // alert(
+    //   `Refund Amount: $${finalRefundAmount.toFixed(2)}\n` +
+    //     `Mode: ${refundData.mode}\n` +
+    //     `Order ID: ${orderId}\n\n` +
+    //     `Check console for full details`,
+    // );
 
     // Uncomment below to actually hit API
     refundMutation.mutate(
-      { orderId, amount: finalRefundAmount.toFixed(2) },
+      { orderId, amount: Math.round(finalRefundAmount * 100).toString() },
       {
         onSuccess: () => {
           onOpenChange(false);
@@ -156,7 +156,7 @@ export function RefundDialog({
           setFixedAmount("");
           setDeductionAmount("");
         },
-      }
+      },
     );
 
     // Close dialog after debug
@@ -200,7 +200,9 @@ export function RefundDialog({
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
                   <span className="text-muted-foreground">Bid Amount:</span>
-                  <span className="ml-2 font-medium">${autoRefund.bidAmount.toFixed(2)}</span>
+                  <span className="ml-2 font-medium">
+                    ${autoRefund.bidAmount.toFixed(2)}
+                  </span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">
@@ -212,9 +214,7 @@ export function RefundDialog({
                 </div>
                 <div>
                   <span className="text-muted-foreground">Total Paid:</span>
-                  <span className="ml-2 font-medium">
-                    ${order.bid.price}
-                  </span>
+                  <span className="ml-2 font-medium">${order.bid.price}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Start Time:</span>
