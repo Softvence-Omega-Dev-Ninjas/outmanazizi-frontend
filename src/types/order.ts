@@ -7,6 +7,8 @@ export interface Order {
   status: string
   createdAt: string
   updatedAt: string
+  isCompletedFromProvider: boolean
+  isCompletedFromConsumer: boolean
 }
 
 export interface OrderDetails extends Order {
@@ -47,6 +49,8 @@ export interface OrderDetails extends Order {
       endTime: string
       toolsNeed: boolean
       file: string[]
+      isCompletedFromServiceProvider: boolean
+      isCompleteFromConsumer: boolean
     }
   }
   consumer: {
