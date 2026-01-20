@@ -61,14 +61,14 @@ export default function OrderPage() {
         (order: Order) =>
           order.id?.toLowerCase().includes(query) ||
           order.status?.toLowerCase().includes(query) ||
-          order.bidId?.toLowerCase().includes(query)
+          order.bidId?.toLowerCase().includes(query),
       );
     }
 
     // Status filter
     if (statusFilter.length > 0) {
       filtered = filtered.filter((order: Order) =>
-        statusFilter.includes(order.status)
+        statusFilter.includes(order.status),
       );
     }
 
@@ -120,12 +120,24 @@ export default function OrderPage() {
 
   const getPaymentStatusBadge = (orderStatus: string) => {
     if (orderStatus === "CANCELLED") {
-      return <Badge className="bg-orange-100 text-orange-800 border-orange-200">Refund</Badge>;
+      return (
+        <Badge className="bg-orange-100 text-orange-800 border-orange-200">
+          Refund
+        </Badge>
+      );
     }
     if (orderStatus === "COMPLETED") {
-      return <Badge className="bg-green-100 text-green-800 border-green-200">Transfer</Badge>;
+      return (
+        <Badge className="bg-green-100 text-green-800 border-green-200">
+          Transfer
+        </Badge>
+      );
     }
-    return <Badge className="bg-gray-100 text-gray-800 border-gray-200">Pending</Badge>;
+    return (
+      <Badge className="bg-gray-100 text-gray-800 border-gray-200">
+        Pending
+      </Badge>
+    );
   };
 
   return (
@@ -165,7 +177,7 @@ export default function OrderPage() {
                   setStatusFilter(
                     checked
                       ? [...statusFilter, "PENDING"]
-                      : statusFilter.filter((s) => s !== "PENDING")
+                      : statusFilter.filter((s) => s !== "PENDING"),
                   );
                 }}
               >
@@ -177,7 +189,7 @@ export default function OrderPage() {
                   setStatusFilter(
                     checked
                       ? [...statusFilter, "IN_PROGRESS"]
-                      : statusFilter.filter((s) => s !== "IN_PROGRESS")
+                      : statusFilter.filter((s) => s !== "IN_PROGRESS"),
                   );
                 }}
               >
@@ -189,7 +201,7 @@ export default function OrderPage() {
                   setStatusFilter(
                     checked
                       ? [...statusFilter, "COMPLETED"]
-                      : statusFilter.filter((s) => s !== "COMPLETED")
+                      : statusFilter.filter((s) => s !== "COMPLETED"),
                   );
                 }}
               >
@@ -201,7 +213,7 @@ export default function OrderPage() {
                   setStatusFilter(
                     checked
                       ? [...statusFilter, "CANCELLED"]
-                      : statusFilter.filter((s) => s !== "CANCELLED")
+                      : statusFilter.filter((s) => s !== "CANCELLED"),
                   );
                 }}
               >
@@ -236,10 +248,17 @@ export default function OrderPage() {
               <TableHead>Order ID</TableHead>
               <TableHead>Service Provider</TableHead>
               <TableHead>Consumer</TableHead>
-              {/* <TableHead>Payment Intent ID</TableHead> */}
               <TableHead>Bid ID</TableHead>
               <TableHead>Order Status</TableHead>
-              <TableHead>Payment Status</TableHead>
+              <TableHead className="text-center text-sm">
+                Job Done by
+                <br />
+                Provider
+              </TableHead>
+              <TableHead className="text-center text-sm">
+                Accepted by <br />
+                Consumer
+              </TableHead>
               <TableHead>Created At</TableHead>
               <TableHead className="text-center">Actions</TableHead>
             </TableRow>
@@ -267,6 +286,9 @@ export default function OrderPage() {
                     <Skeleton className="h-4 w-20" />
                   </TableCell>
                   <TableCell>
+                    <Skeleton className="h-4 w-20" />
+                  </TableCell>
+                  <TableCell>
                     <Skeleton className="h-4 w-24" />
                   </TableCell>
                   <TableCell>
@@ -277,7 +299,7 @@ export default function OrderPage() {
             ) : filteredOrders.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={8}
+                  colSpan={9}
                   className="text-center py-8 text-muted-foreground"
                 >
                   No orders found
@@ -295,14 +317,32 @@ export default function OrderPage() {
                   <TableCell>
                     <UserCell userId={order.consumerId} />
                   </TableCell>
-                  {/* <TableCell className="font-mono text-xs">
-                    {order.paymentIntentId}
-                  </TableCell> */}
                   <TableCell className="font-mono text-xs">
                     {order.bidId.slice(0, 8)}...
                   </TableCell>
                   <TableCell>{getStatusBadge(order.status)}</TableCell>
-                  <TableCell>{getPaymentStatusBadge(order.status)}</TableCell>
+                  <TableCell>
+                    {order.isCompletedFromProvider ? (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        Yes
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                        No
+                      </span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {order.isCompletedFromConsumer ? (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        Yes
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                        No
+                      </span>
+                    )}
+                  </TableCell>
                   <TableCell>
                     {format(new Date(order.createdAt), "MMM dd, yyyy")}
                   </TableCell>
@@ -320,8 +360,9 @@ export default function OrderPage() {
                         <Eye className="mr-2 size-4" />
                         View
                       </Button>
-                      {order.status === "IN_PROGRESS" && (
-                        <>
+                      {/* Show buttons based on completion status */}
+                      {!order.isCompletedFromConsumer &&
+                        order.isCompletedFromProvider && (
                           <Button
                             variant="ghost"
                             size="sm"
@@ -334,6 +375,9 @@ export default function OrderPage() {
                             <DollarSign className="mr-2 size-4" />
                             Refund
                           </Button>
+                        )}
+                      {order.isCompletedFromConsumer &&
+                        order.isCompletedFromProvider && (
                           <Button
                             variant="ghost"
                             size="sm"
@@ -346,8 +390,7 @@ export default function OrderPage() {
                             <ArrowRightLeft className="mr-2 size-4" />
                             Transfer
                           </Button>
-                        </>
-                      )}
+                        )}
                     </div>
                   </TableCell>
                 </TableRow>
