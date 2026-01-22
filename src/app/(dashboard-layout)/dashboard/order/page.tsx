@@ -250,14 +250,18 @@ export default function OrderPage() {
               <TableHead>Consumer</TableHead>
               <TableHead>Bid ID</TableHead>
               <TableHead>Order Status</TableHead>
-              <TableHead className="text-center text-sm">
+
+              <TableHead className="text-center text-sm!">
                 Job Done by
                 <br />
                 Provider
               </TableHead>
-              <TableHead className="text-center text-sm">
+              <TableHead className="text-center text-sm!">
                 Accepted by <br />
                 Consumer
+              </TableHead>
+              <TableHead>
+                Payment <br /> Status
               </TableHead>
               <TableHead>Created At</TableHead>
               <TableHead className="text-center">Actions</TableHead>
@@ -289,6 +293,9 @@ export default function OrderPage() {
                     <Skeleton className="h-4 w-20" />
                   </TableCell>
                   <TableCell>
+                    <Skeleton className="h-4 w-20" />
+                  </TableCell>
+                  <TableCell>
                     <Skeleton className="h-4 w-24" />
                   </TableCell>
                   <TableCell>
@@ -299,7 +306,7 @@ export default function OrderPage() {
             ) : filteredOrders.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={9}
+                  colSpan={10}
                   className="text-center py-8 text-muted-foreground"
                 >
                   No orders found
@@ -321,7 +328,8 @@ export default function OrderPage() {
                     {order.bidId.slice(0, 8)}...
                   </TableCell>
                   <TableCell>{getStatusBadge(order.status)}</TableCell>
-                  <TableCell>
+
+                  <TableCell className="text-center">
                     {order.isCompletedFromProvider ? (
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                         Yes
@@ -332,7 +340,7 @@ export default function OrderPage() {
                       </span>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">
                     {order.isCompletedFromConsumer ? (
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                         Yes
@@ -343,6 +351,7 @@ export default function OrderPage() {
                       </span>
                     )}
                   </TableCell>
+                  <TableCell>{getPaymentStatusBadge(order.status)}</TableCell>
                   <TableCell>
                     {format(new Date(order.createdAt), "MMM dd, yyyy")}
                   </TableCell>
@@ -360,9 +369,10 @@ export default function OrderPage() {
                         <Eye className="mr-2 size-4" />
                         View
                       </Button>
-                      {/* Show buttons based on completion status */}
+                      {/* Show buttons based on completion status and order status */}
                       {!order.isCompletedFromConsumer &&
-                        order.isCompletedFromProvider && (
+                        order.isCompletedFromProvider &&
+                        order.status !== "CANCELLED" && (
                           <Button
                             variant="ghost"
                             size="sm"
@@ -377,7 +387,8 @@ export default function OrderPage() {
                           </Button>
                         )}
                       {order.isCompletedFromConsumer &&
-                        order.isCompletedFromProvider && (
+                        order.isCompletedFromProvider &&
+                        order.status !== "COMPLETED" && (
                           <Button
                             variant="ghost"
                             size="sm"
