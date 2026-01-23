@@ -72,27 +72,23 @@ export function OrderDetailsDialog({
                 </Badge>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Job Completed by Provider</p>
+                <p className="text-sm text-muted-foreground">
+                  Job Completed by Provider
+                </p>
                 {order.isCompletedFromProvider ? (
-                  <Badge className="bg-green-100 text-green-800">
-                    Yes
-                  </Badge>
+                  <Badge className="bg-green-100 text-green-800">Yes</Badge>
                 ) : (
-                  <Badge className="bg-yellow-100 text-yellow-800">
-                    No
-                  </Badge>
+                  <Badge className="bg-yellow-100 text-yellow-800">No</Badge>
                 )}
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Job Completed by Consumer</p>
+                <p className="text-sm text-muted-foreground">
+                  Job Completed by Consumer
+                </p>
                 {order.isCompletedFromConsumer ? (
-                  <Badge className="bg-green-100 text-green-800">
-                    Yes
-                  </Badge>
+                  <Badge className="bg-green-100 text-green-800">Yes</Badge>
                 ) : (
-                  <Badge className="bg-yellow-100 text-yellow-800">
-                    No
-                  </Badge>
+                  <Badge className="bg-yellow-100 text-yellow-800">No</Badge>
                 )}
               </div>
               <div>
@@ -130,7 +126,7 @@ export function OrderDetailsDialog({
                     <div>
                       <p className="text-xs text-muted-foreground">Budget</p>
                       <p className="text-sm font-medium">
-                        ${order.bid.service.budget}
+                        ${order.bid.service.budget / 100}
                       </p>
                     </div>
                   </div>
@@ -139,7 +135,7 @@ export function OrderDetailsDialog({
                     <div>
                       <p className="text-xs text-muted-foreground">Bid Price</p>
                       <p className="text-sm font-medium text-green-600">
-                        ${order.bid.price}
+                        ${order.bid.price / 100}
                       </p>
                     </div>
                   </div>
