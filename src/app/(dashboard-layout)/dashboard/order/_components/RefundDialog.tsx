@@ -49,7 +49,7 @@ export function RefundDialog({
         bidAmount: 0,
       };
 
-    const totalPaid = parseFloat(order.bid.price);
+    const totalPaid = parseFloat(order.bid.price) / 100;
     const feePercent = order.applicationFeePersen || 0;
     const bidAmount = totalPaid / (1 + feePercent / 100);
     const serviceFee = totalPaid - bidAmount;
@@ -94,7 +94,7 @@ export function RefundDialog({
   const calculateManualRefund = () => {
     if (!order) return 0;
 
-    const totalPaid = parseFloat(order.bid.price);
+    const totalPaid = parseFloat(order.bid.price) / 100;
     const feePercent = order.applicationFeePersen || 0;
     const bidAmount = totalPaid / (1 + feePercent / 100);
 
@@ -214,7 +214,9 @@ export function RefundDialog({
                 </div>
                 <div>
                   <span className="text-muted-foreground">Total Paid:</span>
-                  <span className="ml-2 font-medium">${order.bid.price}</span>
+                  <span className="ml-2 font-medium">
+                    ${(order.bid.price / 100).toFixed(2)}
+                  </span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Start Time:</span>
@@ -347,14 +349,14 @@ export function RefundDialog({
                   ${finalRefundAmount.toFixed(2)}
                 </span>
               </div>
-              <div className="flex items-center justify-between text-sm">
+              {/* <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">
                   Service Fee Deducted:
                 </span>
                 <span className="font-medium text-orange-600">
                   -${autoRefund.serviceFeeDeducted.toFixed(2)}
                 </span>
-              </div>
+              </div> */}
               <Separator />
               <div className="flex items-center justify-between">
                 <span className="font-semibold text-lg">
