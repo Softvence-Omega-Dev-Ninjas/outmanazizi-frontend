@@ -54,7 +54,7 @@ export function TransferDialog({
         amountCents: 0,
       };
 
-    const totalPaid = parseFloat(order.bid.price);
+    const totalPaid = parseFloat(order.bid.price) / 100;
     const applicationFeePercent = order.applicationFeePersen || 0;
     const bidAmount = totalPaid / (1 + applicationFeePercent / 100);
 
@@ -230,9 +230,9 @@ export function TransferDialog({
                   </span>
                 </div>
 
-                <div className="text-xs text-muted-foreground">
+                {/* <div className="text-xs text-muted-foreground">
                   Amount in cents: {transfer.amountCents}
-                </div>
+                </div> */}
               </div>
             </div>
 
